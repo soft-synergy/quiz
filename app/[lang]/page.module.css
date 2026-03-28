@@ -252,7 +252,7 @@
 
 .consentRow {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   max-width: 480px;
   text-align: left;
