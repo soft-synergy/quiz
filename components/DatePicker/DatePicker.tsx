@@ -11,7 +11,7 @@ interface Props {
 
 export default function DatePicker({ value, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const fpRef = useRef<ReturnType<typeof flatpickr> | null>(null)
+  const fpRef = useRef<flatpickr.Instance | null>(null)
 
   useEffect(() => {
     if (!inputRef.current) return
@@ -26,7 +26,7 @@ export default function DatePicker({ value, onChange }: Props) {
       onChange: (dates, dateStr) => {
         onChange(dateStr)
       },
-    }) as ReturnType<typeof flatpickr> & { altInput?: HTMLInputElement }
+    }) as flatpickr.Instance
 
     fpRef.current = fp
 
@@ -36,9 +36,10 @@ export default function DatePicker({ value, onChange }: Props) {
     }
 
     // Style the alt input to match the app design
-    if (fp.altInput) {
-      fp.altInput.className = styles.input
-      fp.altInput.placeholder = 'Select a date'
+    const altInput = fp.altInput as HTMLInputElement | undefined
+    if (altInput) {
+      altInput.className = styles.input
+      altInput.placeholder = 'Select a date'
     }
 
     return () => {
