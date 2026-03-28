@@ -1,0 +1,237 @@
+/* ─── ENTRANCE ───────────────────────────────────────────────────── */
+
+@keyframes cardIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes spotIn {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  55%  { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+  75%  { transform: translate(-50%, -50%) scale(0.85); }
+  90%  { transform: translate(-50%, -50%) scale(1.08); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes ringExpand {
+  0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(3.4); opacity: 0; }
+}
+
+@keyframes corePulse {
+  0%, 100% { box-shadow: 0 0 6px 2px rgba(183,60,80,0.7), 0 0 18px 4px rgba(183,60,80,0.3); }
+  50%       { box-shadow: 0 0 12px 5px rgba(183,60,80,0.9), 0 0 28px 8px rgba(183,60,80,0.45); }
+}
+
+@keyframes glowBreathe {
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.75; transform: translate(-50%, -50%) scale(1.35); }
+}
+
+/* Traveling dashes flowing from card toward body */
+@keyframes lineMarch {
+  from { stroke-dashoffset: 14; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* ─── LAYOUT ─────────────────────────────────────────────────────── */
+
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 300px;
+}
+
+/* ─── SVG CONNECTOR ──────────────────────────────────────────────── */
+
+.svgOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  overflow: visible;
+}
+
+/* Flowing dashes */
+.lineFlow {
+  stroke-dasharray: 5 9;
+  stroke-dashoffset: 14;
+  animation: lineMarch 0.45s linear infinite;
+}
+
+/* ─── CARDS COLUMN ───────────────────────────────────────────────── */
+
+.cards {
+  flex: 0 0 56%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 56px;
+  position: relative;
+  z-index: 3;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  height: 54px;
+  /* Pill shape — matches reference */
+  border-radius: 100px;
+  background: #EDEAE4;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition: background 0.2s ease, transform 0.12s ease;
+  will-change: transform;
+  opacity: 0;
+  animation: cardIn 0.3s ease forwards;
+}
+
+.card:hover { transform: translateY(-1px); }
+
+.card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(183, 60, 90, 0.35);
+}
+
+/* Selected: rose / mauve — matches reference */
+.cardSelected { background: #B84D6A; }
+.cardSelected:hover { background: #a84463; }
+
+/* ─── CARD ICON ──────────────────────────────────────────────────── */
+
+.cardIcon {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  margin-left: 14px;
+  margin-right: 10px;
+  border-radius: 50%;
+  border: 1.8px solid #b0aca4;
+  transition: border-color 0.2s ease;
+}
+
+.cardSelected .cardIcon {
+  border-color: rgba(255,255,255,0.6);
+}
+
+.iconPlus,
+.iconCheck {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.iconPlus  { opacity: 1; transform: scale(1); }
+.iconCheck { opacity: 0; transform: scale(0.5); }
+
+.cardSelected .iconPlus  { opacity: 0; transform: scale(0.5) rotate(45deg); }
+.cardSelected .iconCheck { opacity: 1; transform: scale(1); }
+
+/* ─── CARD LABEL ─────────────────────────────────────────────────── */
+
+.cardLabel {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a2825;
+  text-align: center;
+  padding-right: 14px;
+  transition: color 0.2s ease;
+}
+
+.cardSelected .cardLabel { color: #ffffff; }
+
+/* ─── BODY IMAGE COLUMN ──────────────────────────────────────────── */
+
+.body {
+  flex: 0 0 44%;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.bodyImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ─── ZONE SPOTS ─────────────────────────────────────────────────── */
+
+.spotAnchor {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.spot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  animation: spotIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Three sonar rings in rose color */
+.ring1, .ring2, .ring3 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(184, 77, 106, 0.65);
+  animation: ringExpand 2s ease-out infinite;
+}
+
+.ring1 { animation-delay: 0s; }
+.ring2 { animation-delay: 0.66s; }
+.ring3 { animation-delay: 1.32s; }
+
+/* Ambient rose glow */
+.glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(200, 70, 100, 0.55) 0%,
+    rgba(184, 77, 106, 0.2)  45%,
+    transparent 72%
+  );
+  animation: glowBreathe 2s ease-in-out infinite;
+}
+
+/* Inner core dot in rose */
+.core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f4a0b4 0%, #d45070 35%, #b03050 100%);
+  animation: corePulse 2s ease-in-out infinite;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────── */
+
+@media (max-width: 380px) {
+  .cards     { flex: 0 0 54%; }
+  .body      { flex: 0 0 46%; }
+  .cardLabel { font-size: 14px; }
+}

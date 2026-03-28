@@ -1,0 +1,68 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--color-bg);
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 10px;
+}
+
+.btnBack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--color-text);
+  touch-action: manipulation;
+  transition: background 0.15s;
+}
+
+.btnBack:hover {
+  background: var(--color-card);
+}
+
+.btnBack:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(181, 62, 90, 0.4);
+}
+
+.stepCounter {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.01em;
+}
+
+.headerSpacer {
+  width: 36px;
+}
+
+.progressTrack {
+  height: 2px;
+  background: var(--color-progress-track);
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 0 2px 2px 0;
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressFill {
+    transition-duration: 0.01ms;
+  }
+}

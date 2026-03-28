@@ -1,0 +1,45 @@
+@keyframes fadeUp {
+  from { opacity: 0;  }
+  to   { opacity: 1;  }
+}
+
+.ringWrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-top: 40px;
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+
+.ringSvg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--color-progress-track);
+  stroke-width: 9;
+}
+
+.ringProgress {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.ringLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.03em;
+}

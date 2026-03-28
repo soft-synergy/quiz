@@ -1,0 +1,169 @@
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 90px;
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  overflow: hidden;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  will-change: transform;
+
+  /* entrance animation — delay set inline via style prop */
+  opacity: 0;
+  animation: fadeSlideUp 0.35s ease forwards;
+}
+
+.option:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.option:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(181, 62, 90, 0.4);
+}
+
+.optionSelected {
+  background: var(--color-primary);
+}
+
+.optionSelected:hover {
+  background: var(--color-primary-hover);
+}
+
+/* ─── ICON AREA ─────────────────────────────────────────────── */
+.optionIcon {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-left: 20px;
+  margin-right: 14px;
+}
+
+.iconPlus,
+.iconCheck {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.iconPlus {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.iconCheck {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.optionSelected .iconPlus {
+  opacity: 0;
+  transform: scale(0.5) rotate(45deg);
+}
+
+.optionSelected .iconCheck {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ─── LABEL ─────────────────────────────────────────────────── */
+.optionLabel {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.25;
+  transition: color 0.2s ease;
+  padding-right: 8px;
+}
+
+.optionLabelSingle {
+  padding-left: 20px;
+}
+
+.optionSelected .optionLabel {
+  color: #ffffff;
+}
+
+/* ─── EMOJI ─────────────────────────────────────────────────── */
+.optionEmoji {
+  font-size: 36px;
+  line-height: 1;
+  width: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─── IMAGE AREA ────────────────────────────────────────────── */
+.optionImageWrap {
+  position: relative;
+  width: 110px;
+  height: 90px;
+  flex-shrink: 0;
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  overflow: hidden;
+}
+
+.skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-base) 25%,
+    var(--color-skeleton-highlight) 50%,
+    var(--color-skeleton-base) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: inherit;
+  transition: opacity 0.3s ease;
+}
+
+.imageLoaded .skeleton {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.optionImageWrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.imageLoaded img {
+  opacity: 1;
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .optionImageWrap {
+    width: 90px;
+  }
+
+  .optionLabel {
+    font-size: 15px;
+  }
+}

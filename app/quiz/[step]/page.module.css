@@ -1,0 +1,433 @@
+.main {
+  padding-top: 80px;
+  padding-bottom: 120px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  width: 100%;
+  max-width: 580px;
+  padding: 0 20px;
+}
+
+.question {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.3;
+  margin-top: 32px;
+  margin-bottom: 28px;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: -16px 0 20px;
+}
+
+.optionsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── UNIT TOGGLE ────────────────────────────────────────────────── */
+
+.unitToggle {
+  display: flex;
+  justify-content: center;
+  background: var(--color-card);
+  border-radius: 100px;
+  padding: 4px;
+  width: fit-content;
+  margin: 0 auto 16px;
+  gap: 2px;
+}
+
+.unitBtn {
+  font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 100px;
+  padding: 6px 20px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  touch-action: manipulation;
+}
+
+.unitBtnActive {
+  background: var(--color-bg-white);
+  color: var(--color-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── NUMERIC INPUT ──────────────────────────────────────────────── */
+
+.ftInWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.ftInField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.numberInput {
+  font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--color-text);
+  border: none;
+  border-bottom: 2px solid var(--color-border);
+  background: transparent;
+  text-align: center;
+  width: 200px;
+  outline: none;
+  padding: 8px 0;
+  transition: border-color 0.15s ease;
+}
+
+.numberInput:focus {
+  border-color: var(--color-primary);
+}
+
+.numberInputError {
+  border-color: var(--color-error);
+}
+
+.numberInputError:focus {
+  border-color: var(--color-error);
+}
+
+.inputErrorMsg {
+  font-size: 13px;
+  color: var(--color-error);
+  text-align: center;
+  margin-top: 8px;
+}
+
+.numberInput::-webkit-outer-spin-button,
+.numberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numberInput[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.inputUnit {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  align-self: flex-end;
+  padding-bottom: 14px;
+}
+
+/* ─── HINT CARD ──────────────────────────────────────────────────── */
+
+.hintCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
+  margin-top: 24px;
+}
+
+.hintIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.hintBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hintTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.hintText {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── LIVE BMI CARD ──────────────────────────────────────────────── */
+
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bmiLiveCard {
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
+  margin-top: 24px;
+  opacity: 0;
+  min-height: 80px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: opacity 0.2s ease;
+  background: var(--color-card);
+}
+
+.bmiLiveCardVisible {
+  animation: cardFadeIn 0.25s ease both;
+  opacity: 1;
+}
+
+.bmiCardUnderweight { background: #E0EEFF; }
+.bmiCardNormal      { background: #DCF5E5; }
+.bmiCardOverweight  { background: #FFF0C0; }
+.bmiCardObese       { background: #FFD5D5; }
+
+.bmiCardEmoji {
+  font-size: 32px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.bmiCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bmiCardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.bmiCardBody {
+  font-size: 14px;
+  color: var(--color-text-mid);
+  line-height: 1.5;
+}
+
+.bmiLivePlaceholder {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 8px 0;
+  width: 100%;
+}
+
+/* ─── GOAL ANALYSIS CARD ─────────────────────────────────────────── */
+
+.goalCard {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
+  margin-top: 24px;
+  opacity: 0;
+  min-height: 72px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.goalCardOutOfRange {
+  background: #FFE4E4;
+}
+
+.goalCardVisible {
+  animation: cardFadeIn 0.25s ease both;
+  opacity: 1;
+}
+
+.goalCardEmoji {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.goalCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goalCardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.goalCardBody {
+  font-size: 14px;
+  color: var(--color-text-mid);
+  line-height: 1.5;
+}
+
+.goalDesc {
+  font-size: 14px;
+  color: var(--color-text-mid);
+  line-height: 1.4;
+}
+
+/* ─── TEXT INPUT (name) ──────────────────────────────────────────── */
+
+.textInputWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.textInput {
+  font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--color-text);
+  border: none;
+  border-bottom: 2px solid var(--color-border);
+  background: transparent;
+  text-align: center;
+  width: 100%;
+  max-width: 340px;
+  outline: none;
+  padding: 8px 0;
+  transition: border-color 0.15s ease;
+}
+
+.textInput:focus {
+  border-color: var(--color-primary);
+}
+
+.textInput::placeholder {
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+.charCount {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 8px;
+  align-self: flex-end;
+  max-width: 340px;
+  width: 100%;
+  text-align: right;
+}
+
+/* ─── DATE INPUT ─────────────────────────────────────────────────── */
+
+.dateInputWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.dateInput {
+  font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  padding: 14px 20px;
+  outline: none;
+  width: 100%;
+  max-width: 340px;
+  transition: border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.dateInput:focus {
+  border-color: var(--color-primary);
+}
+
+/* ─── CONSENT CHECKBOX ───────────────────────────────────────────── */
+
+.consentRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.consentCheck {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: transparent;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.consentChecked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.consentText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.consentText a {
+  color: var(--color-text-mid);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .question {
+    font-size: 19px;
+  }
+
+  .numberInput {
+    font-size: 48px;
+    width: 170px;
+  }
+
+  .textInput {
+    font-size: 32px;
+  }
+}

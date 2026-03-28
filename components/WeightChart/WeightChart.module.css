@@ -1,0 +1,117 @@
+@keyframes fadeSlideUp {
+  from { opacity: 0;  }
+  to   { opacity: 1;  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes dotPop {
+  0%   { opacity: 0; transform: scale(0.2); }
+  65%  {  }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes labelIn {
+  from { opacity: 0;  }
+  to   { opacity: 1;  }
+}
+
+.chartCard {
+  width: 100%;
+  background: white;
+  border-radius: var(--radius-card);
+  padding: 22px 18px 18px;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s 0.25s ease both;
+}
+
+.chartCardLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 14px;
+}
+
+.chartWrap {
+  width: 100%;
+}
+
+.weightChart {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* ─── SVG ANIMATION CLASSES ─────────────────────────────────── */
+
+.chartArea {
+  opacity: 0;
+  animation: fadeIn 0.5s 2.1s ease both;
+}
+
+.chartLine {
+  stroke-dasharray: 620;
+  stroke-dashoffset: 620;
+  animation: drawLine 1.7s 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.dot1 {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dotPop 0.35s 0.6s ease both;
+}
+
+.dot2 {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dotPop 0.35s 1.12s ease both;
+}
+
+.dot3 {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dotPop 0.35s 1.65s ease both;
+}
+
+.dot4 {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dotPop 0.4s 2.15s ease both;
+}
+
+.lbl1 {
+  opacity: 0;
+  animation: labelIn 0.3s 0.78s ease both;
+}
+
+.lbl2 {
+  opacity: 0;
+  animation: labelIn 0.3s 1.3s ease both;
+}
+
+.lbl3 {
+  opacity: 0;
+  animation: labelIn 0.3s 1.83s ease both;
+}
+
+.lbl4 {
+  opacity: 0;
+  animation: labelIn 0.35s 2.33s ease both;
+}

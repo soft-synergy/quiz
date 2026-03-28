@@ -1,0 +1,115 @@
+@keyframes fadeSlideUp {
+  from { opacity: 0;  }
+  to   { opacity: 1;  }
+}
+
+.bmiCard {
+  background: white;
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s 0.15s ease both;
+}
+
+.bmiCardTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.bmiLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.bmiValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.bmiScaleWrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.bmiScaleBar {
+  height: 8px;
+  border-radius: 100px;
+  background: linear-gradient(
+    to right,
+    #4dbf7a 0%,
+    #83cc66 22%,
+    #f0c040 44%,
+    #f08040 66%,
+    #e05040 85%,
+    #c83030 100%
+  );
+}
+
+.bmiMarkerWrap {
+  position: absolute;
+  top: -44px;
+  left: 0;
+  transform: translateX(0);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.bmiTooltip {
+  background: var(--color-tooltip-bg);
+  color: var(--color-bg-white);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 5px 8px;
+  border-radius: 7px;
+  text-align: center;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  position: relative;
+}
+
+.bmiTooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 4px 0;
+  border-style: solid;
+  border-color: var(--color-tooltip-bg) transparent transparent;
+}
+
+.bmiMarkerDot {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-bg-white);
+  border: 2.5px solid var(--color-tooltip-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.bmiScaleLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.bmiScaleLabels span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
