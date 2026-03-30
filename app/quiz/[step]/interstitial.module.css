@@ -17,9 +17,9 @@
 /* ─── IMAGE CARD (standard) ──────────────────────────────────────── */
 
 .imageCard {
-  width: 100%;
-  max-width: 580px;
-  aspect-ratio: 16/9;
+  width: calc(100% - 40px);
+  max-width: 540px;
+  aspect-ratio: 3/2;
   border-radius: 18px;
   overflow: hidden;
   flex-shrink: 0;
