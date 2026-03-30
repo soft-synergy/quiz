@@ -19,7 +19,6 @@
 .imageCard {
   width: calc(100% - 40px);
   max-width: 540px;
-  margin-top: -60px;
   border-radius: 18px;
   overflow: hidden;
   flex-shrink: 0;
