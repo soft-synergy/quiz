@@ -25,7 +25,7 @@ export default function IntroLangPage() {
   const [consentError, setConsentError] = useState(false)
   const [personImgLoaded, setPersonImgLoaded] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
-  const footerRef = useRef<HTMLElement>(null)
+  const errorRef = useRef<HTMLDivElement>(null)
 
   // Handle cached images — onLoad won't fire if browser already has it
   useEffect(() => {
@@ -47,7 +47,9 @@ export default function IntroLangPage() {
   const handleAge = (age: string) => {
     if (!consentChecked) {
       setConsentError(true)
-      footerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      setTimeout(() => {
+        errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 50)
       return
     }
     reset()
@@ -114,7 +116,7 @@ export default function IntroLangPage() {
         </nav>
       </div>
 
-      <footer ref={footerRef} className={styles.footer}>
+      <footer className={styles.footer}>
         <LangPicker
           currentLang={lang}
           ariaLabel={t.lang_button_aria}
@@ -144,7 +146,7 @@ export default function IntroLangPage() {
           </p>
         </div>
         {consentError && (
-          <div className={styles.consentError} role="alert">
+          <div ref={errorRef} className={styles.consentError} role="alert">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
