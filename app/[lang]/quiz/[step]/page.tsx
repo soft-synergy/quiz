@@ -34,7 +34,11 @@ function StepContent({
   const savedAnswer = answers[stepNum]
   const canonicalUnit = stepData?.units?.[0] ?? stepData?.unit ?? ''
 
-  const [inputUnit, setInputUnit] = useState<string>(canonicalUnit)
+  const [inputUnit, setInputUnit] = useState<string>(() => {
+    // Default height to ft/in display (more intuitive for most users)
+    if (stepData?.units?.includes('in') && canonicalUnit === 'cm') return 'in'
+    return canonicalUnit
+  })
   const [inputValue, setInputValue] = useState<string>(() => {
     if (typeof savedAnswer === 'string' && stepData?.type === 'input-number' && savedAnswer) return savedAnswer
     return ''
@@ -306,7 +310,20 @@ function StepContent({
                     inputMode="decimal"
                     placeholder={stepData.placeholder ?? ''}
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      // Auto-switch: single digit 4–8 in cm mode looks like feet → switch to ft/in
+                      if (stepData?.units?.includes('in') && canonicalUnit === 'cm' && val.length === 1) {
+                        const num = Number(val)
+                        if (num >= 4 && num <= 8) {
+                          setInputUnit('in')
+                          setFtValue(val)
+                          setInchValue('')
+                          return
+                        }
+                      }
+                      setInputValue(val)
+                    }}
                     autoFocus
                   />
                   <span className={styles.inputUnit}>{hasUnitToggle ? inputUnit : stepData.unit}</span>

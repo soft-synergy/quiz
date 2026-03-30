@@ -1,0 +1,623 @@
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Layout — identical pattern to all quiz pages ────────────────── */
+.main {
+  padding-top: 72px;
+  padding-bottom: 60px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  width: 100%;
+  max-width: 540px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Section spacing ─────────────────────────────────────────────── */
+.block {
+  margin-top: 32px;
+}
+
+/* ── Title — same as .question in step pages ─────────────────────── */
+.pageTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-top: 28px;
+  margin-bottom: 4px;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s 0.05s ease both;
+}
+
+.pageSub {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s 0.12s ease both;
+}
+
+/* ── Chips (target / level) ──────────────────────────────────────── */
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s 0.18s ease both;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-card);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-mid);
+}
+.chipDot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ── Section heading (smaller than pageTitle) ────────────────────── */
+.heading {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+
+/* ── BMI status — same colours as step page bmiCard variants ─────── */
+.bmiStatus {
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: cardFadeIn 0.3s 0.3s ease both;
+}
+.bmiStatusWarn { background: #FFF0C0; }
+.bmiStatusRed  { background: #FFD5D5; }
+.bmiStatusBlue { background: #E0EEFF; }
+.bmiStatusGreen { background: #DCF5E5; }
+
+.bmiStatusEmoji { font-size: 28px; flex-shrink: 0; line-height: 1; }
+.bmiStatusLabel {
+  font-size: 15px; font-weight: 700;
+  color: var(--color-text); line-height: 1.3; margin-bottom: 4px;
+}
+.bmiStatusText {
+  font-size: 14px; color: var(--color-text-mid); line-height: 1.5;
+}
+
+/* ── Info cards (workout / water) — same as hintCard ────────────── */
+.infoCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
+  opacity: 0;
+  animation: cardFadeIn 0.3s ease both;
+}
+.infoCard + .infoCard { margin-top: 10px; }
+.infoCard:nth-child(1) { animation-delay: 0.35s; }
+.infoCard:nth-child(2) { animation-delay: 0.45s; }
+
+.infoIcon { font-size: 28px; flex-shrink: 0; line-height: 1; }
+
+.infoCardLabel {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--color-text-secondary); margin-bottom: 4px;
+}
+.infoCardNum {
+  font-size: 28px; font-weight: 700;
+  color: var(--color-text); letter-spacing: -0.02em; line-height: 1;
+}
+.infoCardUnit {
+  font-size: 15px; font-weight: 500; color: var(--color-text-secondary);
+}
+.infoCardBadge {
+  display: inline-block;
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 100px; margin-top: 6px;
+}
+.waterCups { display: flex; gap: 3px; margin: 4px 0 4px; flex-wrap: wrap; }
+.cup       { font-size: 14px; opacity: 0.22; }
+.cupFull   { font-size: 14px; opacity: 1; }
+
+/* ── Stats 2×2 — same card style as bmiLiveCard ─────────────────── */
+.statsGrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.statCard {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 16px 14px;
+  display: flex; gap: 10px; align-items: flex-start;
+  opacity: 0; animation: cardFadeIn 0.3s ease both;
+}
+.statCard:nth-child(1) { animation-delay: 0.08s; }
+.statCard:nth-child(2) { animation-delay: 0.15s; }
+.statCard:nth-child(3) { animation-delay: 0.22s; }
+.statCard:nth-child(4) { animation-delay: 0.29s; }
+
+.statIcon { font-size: 18px; flex-shrink: 0; }
+.statLabel {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--color-text-secondary); margin-bottom: 3px; line-height: 1;
+}
+.statValue { font-size: 13px; font-weight: 600; color: var(--color-text); line-height: 1.25; }
+
+/* ── Feature rows ────────────────────────────────────────────────── */
+.featureRow {
+  display: flex; gap: 14px; align-items: flex-start;
+  opacity: 0; animation: cardFadeIn 0.3s ease both;
+}
+.featureRow + .featureRow { margin-top: 18px; }
+.featureRow:nth-child(1) { animation-delay: 0.05s; }
+.featureRow:nth-child(2) { animation-delay: 0.12s; }
+.featureRow:nth-child(3) { animation-delay: 0.19s; }
+.featureRow:nth-child(4) { animation-delay: 0.26s; }
+
+.featureIcon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--color-card);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.featureTitle { font-size: 15px; font-weight: 700; color: var(--color-text); margin-bottom: 3px; }
+.featureDesc  { font-size: 14px; color: var(--color-text-secondary); line-height: 1.5; }
+
+/* ── Social proof ────────────────────────────────────────────────── */
+.socialCard {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 22px 20px;
+  text-align: center;
+  opacity: 0;
+  animation: cardFadeIn 0.3s 0.05s ease both;
+}
+.socialNum {
+  font-size: 34px; font-weight: 800;
+  color: var(--color-text); letter-spacing: -0.03em; line-height: 1;
+}
+.socialSub {
+  font-size: 14px; color: var(--color-text-secondary); line-height: 1.4;
+  margin: 6px 0 14px;
+}
+.ratingRow {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 100px; padding: 8px 16px;
+}
+.stars { color: var(--color-star-filled); font-size: 14px; }
+.ratingText { font-size: 13px; font-weight: 600; color: var(--color-text-mid); }
+
+/* ── Reviews ─────────────────────────────────────────────────────── */
+.reviewCard {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+  opacity: 0; animation: cardFadeIn 0.3s ease both;
+}
+.reviewCard + .reviewCard { margin-top: 10px; }
+.reviewCard:nth-child(1) { animation-delay: 0.05s; }
+.reviewCard:nth-child(2) { animation-delay: 0.15s; }
+
+.reviewTop {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+}
+.reviewer { display: flex; align-items: center; gap: 10px; }
+.reviewAvatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--color-border); overflow: hidden; flex-shrink: 0;
+}
+.reviewAvatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.reviewName   { font-size: 13px; font-weight: 600; color: var(--color-text); }
+.reviewStars  { font-size: 11px; color: var(--color-star-filled); }
+.reviewSource { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); }
+.reviewText   { font-size: 13px; color: var(--color-text-mid); line-height: 1.6; }
+
+/* ── Before / after ──────────────────────────────────────────────── */
+.beforeAfter {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px; border-radius: var(--radius-card);
+  overflow: hidden; background: var(--color-border);
+  margin-top: 10px;
+}
+.baHalf {
+  position: relative; aspect-ratio: 3/4;
+  background: var(--color-card);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.baHalf img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.baLabel {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  background: rgba(26,26,24,0.6); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 100px; white-space: nowrap;
+}
+
+/* ── Discount banner — same bg as goalCardOutOfRange ─────────────── */
+.discountBanner {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--color-warning-bg);
+  border-radius: var(--radius-card);
+  padding: 14px 16px; margin-bottom: 20px;
+  opacity: 0; animation: cardFadeIn 0.3s 0.05s ease both;
+}
+.discountLeft { display: flex; align-items: center; gap: 10px; }
+.discountFire { font-size: 22px; flex-shrink: 0; }
+.discountPcts { display: flex; align-items: baseline; gap: 6px; }
+.discountOld  { font-size: 14px; font-weight: 600; text-decoration: line-through; color: var(--color-text-secondary); }
+.discountNew  { font-size: 22px; font-weight: 800; color: var(--color-text); letter-spacing: -0.02em; }
+.discountSub  { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+
+/* Countdown — dark blocks */
+.countdown { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.cdBlock { background: var(--color-text); border-radius: 8px; padding: 6px 10px; text-align: center; min-width: 44px; }
+.cdNum   { display: block; font-size: 20px; font-weight: 700; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+.cdLabel { display: block; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-top: 2px; }
+.cdColon { font-size: 16px; font-weight: 700; color: var(--color-text-secondary); margin-bottom: 6px; }
+
+/* ── Plan badge ──────────────────────────────────────────────────── */
+.planBadgeWrap { text-align: center; margin-bottom: 6px; }
+.planBadge {
+  display: inline-block; background: var(--color-primary); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 100px;
+}
+
+/* ── Plan card — same hover/select pattern as OptionCard ─────────── */
+.planCard {
+  width: 100%; background: var(--color-card);
+  border: 2px solid transparent;
+  border-radius: var(--radius-card);
+  padding: 14px 16px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; text-align: left; font-family: inherit;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+  opacity: 0; animation: cardFadeIn 0.3s ease both;
+}
+.planCard:nth-child(1) { animation-delay: 0.1s; }
+.planCard:nth-child(2) { animation-delay: 0.18s; }
+.planCard:nth-child(3) { animation-delay: 0.26s; }
+.planCard:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+.planCardSelected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.planCardSelected:hover { background: var(--color-primary); }
+
+/* Radio — outer circle */
+.planRadio {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--color-border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-bg-white);
+  transition: border-color 0.15s, background 0.15s;
+}
+.planCardSelected .planRadio {
+  border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.2);
+}
+
+.planInfo { flex: 1; }
+.planName   { font-size: 16px; font-weight: 700; color: var(--color-text); margin-bottom: 4px; }
+.planCardSelected .planName  { color: #fff; }
+.planPrices { display: flex; align-items: center; gap: 8px; }
+.planTotal  { font-size: 14px; font-weight: 600; color: var(--color-text); }
+.planCardSelected .planTotal { color: rgba(255,255,255,0.9); }
+.planOrig   { font-size: 12px; text-decoration: line-through; color: var(--color-text-secondary); }
+.planCardSelected .planOrig  { color: rgba(255,255,255,0.55); }
+
+.planRight { text-align: right; flex-shrink: 0; }
+.planPerDayOld {
+  display: block; font-size: 11px; text-decoration: line-through;
+  color: var(--color-text-secondary); text-align: right;
+}
+.planCardSelected .planPerDayOld { color: rgba(255,255,255,0.55); }
+.planPerDay {
+  display: block; font-size: 22px; font-weight: 800;
+  color: var(--color-primary); letter-spacing: -0.02em; line-height: 1.1;
+}
+.planCardSelected .planPerDay { color: #fff; }
+.planPerDayUnit { display: block; font-size: 11px; color: var(--color-text-secondary); text-align: right; }
+.planCardSelected .planPerDayUnit { color: rgba(255,255,255,0.6); }
+
+/* ── Guarantee link ──────────────────────────────────────────────── */
+.guaranteeRow {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; font-size: 13px; color: var(--color-text-secondary); margin: 10px 0 14px;
+}
+.guaranteeLink { color: var(--color-text-mid); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── Bonus hint — same as hintCard ──────────────────────────────── */
+.bonusRow {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--color-card); border-radius: var(--radius-card);
+  padding: 16px 18px; margin-bottom: 0;
+  font-size: 14px; color: var(--color-text-secondary); line-height: 1.5;
+}
+
+/* ── CTA — pixel-perfect copy of QuizFooter .btn ────────────────── */
+.ctaBtn {
+  width: 100%; height: 52px; border: none;
+  border-radius: var(--radius-btn);
+  background: var(--color-primary); color: #fff;
+  font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px; font-weight: 500; cursor: pointer;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  margin-top: 20px;
+}
+.ctaBtn:hover { box-shadow: 0 4px 18px rgba(181,62,90,0.28); transform: translateY(-1px); }
+.ctaBtn:active { transform: none; box-shadow: none; }
+.ctaBtn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(181,62,90,0.4); }
+
+/* ── Consent — same as step page consentRow ──────────────────────── */
+.consentRow {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-top: 20px; cursor: pointer; user-select: none;
+}
+.consentCheck {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 8px;
+  background: transparent; border: 2px solid var(--color-border);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px; transition: background 0.15s, border-color 0.15s;
+}
+.consentChecked { background: var(--color-primary); border-color: var(--color-primary); }
+.consentText { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+.consentText a { color: var(--color-text-mid); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── Guarantee section ───────────────────────────────────────────── */
+.guaranteeBlock {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 24px 20px;
+  text-align: center;
+  margin-top: 32px;
+}
+.guaranteeEmoji { font-size: 36px; margin-bottom: 12px; }
+.guaranteeTitle { font-size: 18px; font-weight: 700; color: var(--color-text); letter-spacing: -0.01em; line-height: 1.3; margin-bottom: 10px; }
+.guaranteeBody  { font-size: 13px; color: var(--color-text-secondary); line-height: 1.65; margin-bottom: 16px; }
+.guaranteeLinks { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.guaranteeLinks a { font-size: 12px; color: var(--color-text-secondary); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+.footer { margin-top: 32px; text-align: center; padding-bottom: 8px; }
+.footerCopy { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
+
+/* ── Pricing block wrapper ───────────────────────────────────────── */
+.pricingBlock {
+  margin-top: 20px;
+  margin-bottom: 24px;
+}
+
+/* ── Plan name row (name + discount inline) ──────────────────────── */
+.planNameRow {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 2px;
+}
+.planDiscount {
+  font-size: 11px; font-weight: 700;
+  color: var(--color-primary); background: var(--color-primary-pale);
+  padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+}
+.planCardSelected .planDiscount {
+  color: var(--color-primary); background: rgba(255,255,255,0.9);
+}
+.planDesc {
+  font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;
+}
+.planCardSelected .planDesc { color: rgba(255,255,255,0.7); }
+
+/* ── Money-back row inside pricing block ─────────────────────────── */
+.moneyBackRow {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 12px; color: var(--color-text-secondary); line-height: 1.5;
+  margin-top: 4px; margin-bottom: 0;
+}
+.moneyBackRow svg { flex-shrink: 0; margin-top: 2px; color: var(--color-primary); }
+
+/* ── BMI card (inside Your results section) ──────────────────────── */
+.bmiCard {
+  display: flex; align-items: center; gap: 14px;
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  margin-top: 14px; margin-bottom: 12px;
+  overflow: hidden;
+}
+.bmiCardNormal      { background: #DCF5E5; }
+.bmiCardOverweight  { background: #FFF0C0; }
+.bmiCardObese       { background: #FFD5D5; }
+.bmiCardUnderweight { background: #E0EEFF; }
+
+.bmiCardText { flex: 1; }
+.bmiCardTitle {
+  font-size: 14px; font-weight: 700; color: var(--color-text);
+  margin-bottom: 4px; line-height: 1.3;
+}
+.bmiCardBody {
+  font-size: 13px; color: var(--color-text-mid); line-height: 1.55; margin: 0;
+}
+.bmiCardImg {
+  width: 64px; height: 64px; border-radius: 10px;
+  object-fit: cover; flex-shrink: 0;
+}
+
+/* ── Callout row ─────────────────────────────────────────────────── */
+.calloutRow {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--color-card); border-radius: var(--radius-card);
+  padding: 12px 16px;
+}
+.calloutIcon { font-size: 18px; flex-shrink: 0; }
+.calloutText { font-size: 14px; font-weight: 600; color: var(--color-text); }
+
+/* ── Info card body + image variant ─────────────────────────────── */
+.infoCardBody { flex: 1; }
+.infoCardImg {
+  width: 70px; height: 70px; border-radius: 10px;
+  object-fit: cover; flex-shrink: 0;
+}
+.infoCardSub {
+  font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;
+}
+
+/* ── Bullet card ─────────────────────────────────────────────────── */
+.bulletCard {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
+}
+.bulletTitle {
+  font-size: 15px; font-weight: 700; color: var(--color-text); margin-bottom: 10px;
+}
+.bulletList {
+  margin: 0; padding-left: 20px;
+  font-size: 14px; color: var(--color-text-secondary); line-height: 1.8;
+}
+
+/* ── Feature image ───────────────────────────────────────────────── */
+.featureImg {
+  width: 52px; height: 52px; border-radius: 10px;
+  object-fit: cover; flex-shrink: 0;
+}
+
+/* ── Social block (full-width CTA callout) ───────────────────────── */
+.socialBlock {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: 24px 20px;
+  text-align: center;
+  margin-top: 32px;
+}
+.socialText {
+  font-size: 17px; font-weight: 700; color: var(--color-text);
+  line-height: 1.35; margin-bottom: 8px;
+}
+/* .socialSub already defined above — reuse its style */
+
+/* ── Personalized heading section ────────────────────────────────── */
+.personalHeading {
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 0;
+}
+.pageTitleAlt {
+  font-size: 22px; font-weight: 700; color: var(--color-text);
+  line-height: 1.3; letter-spacing: -0.01em;
+}
+
+/* ── Guarantee image ─────────────────────────────────────────────── */
+.guaranteeImg {
+  width: 72px; height: 72px; border-radius: 50%;
+  object-fit: cover; margin: 0 auto 14px; display: block;
+}
+
+/* ── Result stat cards (4 stacked, image 10 style) ───────────────── */
+.resultStatsList {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-top: 16px;
+}
+.resultStatCard {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff;
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.resultStatIcon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: #f0f0f0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.resultStatLabel {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--color-text-secondary); margin-bottom: 3px;
+}
+.resultStatValue {
+  font-size: 15px; font-weight: 700; color: var(--color-text); line-height: 1.2; margin: 0;
+}
+
+/* ── Stat info card (7min / water, image 8+9 style) ─────────────── */
+.statInfoCard {
+  background: #fff;
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+  margin-top: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.statInfoCardHeader {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.statInfoIcon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: #f0f0f0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.statInfoTitle {
+  font-size: 14px; font-weight: 700; color: var(--color-text);
+  line-height: 1.3; margin: 0;
+}
+.statInfoCardFooter {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.statInfoNum {
+  font-size: 32px; font-weight: 800; color: var(--color-text);
+  letter-spacing: -0.03em; line-height: 1;
+}
+.statInfoUnit {
+  font-size: 16px; font-weight: 500; color: var(--color-text-secondary);
+}
+.statInfoBadge {
+  display: inline-block;
+  background: #e8f5e9; color: #388e3c;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 6px;
+}
+
+/* ── Water glasses row ───────────────────────────────────────────── */
+.waterGlasses {
+  display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.waterGlass {
+  width: 28px; height: 35px;
+}

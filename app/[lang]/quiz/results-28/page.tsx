@@ -89,7 +89,7 @@ export default function Results28Page() {
 
   const handleContinue = () => {
     setDirection('forward')
-    router.push(base)
+    router.push(`${base}/quiz/paywall`)
   }
 
   return (
