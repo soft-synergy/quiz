@@ -148,7 +148,7 @@ function StepContent({
             <p className={interStyles.para}>{body}</p>
           </div>
         </main>
-        <QuizFooter onClick={() => navigate('forward')} />
+        <QuizFooter onClick={() => navigate('forward')} sticky={false} />
       </>
     )
   }

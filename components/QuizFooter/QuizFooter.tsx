@@ -9,6 +9,7 @@ interface Props {
   label?: string
   onSkip?: () => void
   skipLabel?: string
+  sticky?: boolean
 }
 
 export default function QuizFooter({
@@ -17,12 +18,13 @@ export default function QuizFooter({
   label,
   onSkip,
   skipLabel,
+  sticky = true,
 }: Props) {
   const lang = useLangStore((s) => s.lang)
   const t = useUITranslations(lang)
 
   return (
-    <footer className={styles.footer}>
+    <footer className={sticky ? styles.footer : styles.footerInline}>
       <button
         className={styles.btn}
         disabled={disabled}
