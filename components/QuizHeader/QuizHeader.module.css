@@ -7,6 +7,15 @@
   background: var(--color-bg);
 }
 
+.headerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: transparent;
+}
+
 .headerTop {
   display: flex;
   align-items: center;

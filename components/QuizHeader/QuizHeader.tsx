@@ -12,6 +12,7 @@ interface Props {
   showBack?: boolean
   progress?: number
   hideProgress?: boolean
+  overlay?: boolean
   onBack?: () => void
 }
 
@@ -22,6 +23,7 @@ export default function QuizHeader({
   showBack = true,
   progress,
   hideProgress = false,
+  overlay = false,
   onBack,
 }: Props) {
   const router = useRouter()
@@ -46,7 +48,7 @@ export default function QuizHeader({
   }
 
   return (
-    <header className={styles.header}>
+    <header className={overlay ? styles.headerOverlay : styles.header}>
       <div className={styles.headerTop}>
         {showBack ? (
           <button

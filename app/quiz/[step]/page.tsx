@@ -529,6 +529,7 @@ export default function QuizStepPage() {
         step={isInterstitialStep ? undefined : questionStepNum || undefined}
         totalSteps={isInterstitialStep ? undefined : questionTotal}
         hideProgress={isInterstitialStep}
+        overlay={isInterstitialStep}
         onBack={() => navigate('backward')}
       />
       <StepContent key={stepNum} stepNum={stepNum} navigate={navigate} />
