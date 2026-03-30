@@ -1,7 +1,7 @@
 'use client'
 import styles from './page.module.css'
 import { useRouter, useParams, notFound } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
 import { useIntroT, LANGUAGES } from '@/lib/i18n'
@@ -24,6 +24,7 @@ export default function IntroLangPage() {
   const [consentChecked, setConsentChecked] = useState(false)
   const [consentError, setConsentError] = useState(false)
   const [personImgLoaded, setPersonImgLoaded] = useState(false)
+  const consentRef = useRef<HTMLDivElement>(null)
 
   // sync URL lang → store
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function IntroLangPage() {
   const handleAge = (age: string) => {
     if (!consentChecked) {
       setConsentError(true)
+      consentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
     reset()
@@ -105,7 +107,7 @@ export default function IntroLangPage() {
         </nav>
       </div>
 
-      <footer className={styles.footer}>
+      <footer ref={consentRef} className={styles.footer}>
         <LangPicker
           currentLang={lang}
           ariaLabel={t.lang_button_aria}
