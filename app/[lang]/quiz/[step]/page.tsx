@@ -503,6 +503,7 @@ export default function QuizStepPage() {
           const next = stepNum + 1
           setStepNum(next)
           window.history.pushState(null, '', `${base}/${next}`)
+          window.scrollTo(0, 0)
         }
       } else {
         if (stepNum <= 1) {
@@ -511,6 +512,7 @@ export default function QuizStepPage() {
           const prev = stepNum - 1
           setStepNum(prev)
           window.history.pushState(null, '', `${base}/${prev}`)
+          window.scrollTo(0, 0)
         }
       }
     },
