@@ -6,6 +6,7 @@ import BMIScale from '@/components/BMIScale/BMIScale'
 import { useQuizStore } from '@/lib/quiz-store'
 import { calcBMI, getBMICategory } from '@/lib/bmi-utils'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
+import { localizeBrandValue } from '@/lib/brand'
 
 const PLANS = [
   { id: '28d', discount: '83%', total: '€8.80', origTotal: '€51.67', perDay: '€0.31' },
@@ -699,7 +700,7 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
 export default function PaywallPage() {
   const { answers, _hydrated } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
-  const copy = COPY[lang] ?? EN
+  const copy = localizeBrandValue(COPY[lang] ?? EN, lang)
   const [selected, setSelected] = useState<string>('12w')
   const [consent, setConsent] = useState(false)
 

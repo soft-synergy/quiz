@@ -1,6 +1,7 @@
 import type { LangCode } from './lang-store'
 import { QUIZ_STEPS } from './quiz-data'
 import type { QuizStep } from './quiz-data'
+import { localizeBrandValue } from './brand'
 
 export const LANGUAGES: { code: LangCode; label: string; flag: string }[] = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
@@ -687,22 +688,22 @@ const quizSteps: Record<LangCode, Record<number, QuizStepT>> = {
   },
 }
 
-export function useIntroT(lang: LangCode): IntroTranslations { return intro[lang] ?? intro.en }
-export function useUITranslations(lang: LangCode): UITranslations { return ui[lang] ?? ui.en }
-export function useStepPageT(lang: LangCode): StepPageTranslations { return stepPage[lang] ?? stepPage.en }
-export function useResultT(lang: LangCode): ResultTranslations { return result[lang] ?? result.en }
-export function useResults28T(lang: LangCode): Results28Translations { return results28[lang] ?? results28.en }
-export function useWellnessT(lang: LangCode): WellnessTranslations { return wellness[lang] ?? wellness.en }
-export function useLoadingT(lang: LangCode): LoadingTranslations { return loading[lang] ?? loading.en }
-export function useEmailT(lang: LangCode): EmailTranslations { return email[lang] ?? email.en }
+export function useIntroT(lang: LangCode): IntroTranslations { return localizeBrandValue(intro[lang] ?? intro.en, lang) }
+export function useUITranslations(lang: LangCode): UITranslations { return localizeBrandValue(ui[lang] ?? ui.en, lang) }
+export function useStepPageT(lang: LangCode): StepPageTranslations { return localizeBrandValue(stepPage[lang] ?? stepPage.en, lang) }
+export function useResultT(lang: LangCode): ResultTranslations { return localizeBrandValue(result[lang] ?? result.en, lang) }
+export function useResults28T(lang: LangCode): Results28Translations { return localizeBrandValue(results28[lang] ?? results28.en, lang) }
+export function useWellnessT(lang: LangCode): WellnessTranslations { return localizeBrandValue(wellness[lang] ?? wellness.en, lang) }
+export function useLoadingT(lang: LangCode): LoadingTranslations { return localizeBrandValue(loading[lang] ?? loading.en, lang) }
+export function useEmailT(lang: LangCode): EmailTranslations { return localizeBrandValue(email[lang] ?? email.en, lang) }
 
 export function getTranslatedSteps(lang: LangCode): QuizStep[] {
   const overrides = quizSteps[lang]
-  if (!overrides || Object.keys(overrides).length === 0) return QUIZ_STEPS
+  if (!overrides || Object.keys(overrides).length === 0) return QUIZ_STEPS.map((step) => localizeBrandValue(step, lang))
   return QUIZ_STEPS.map((step) => {
     const o = overrides[step.step]
-    if (!o) return step
-    return {
+    if (!o) return localizeBrandValue(step, lang)
+    return localizeBrandValue({
       ...step,
       ...(o.question && { question: o.question }),
       ...(o.subtitle && { subtitle: o.subtitle }),
@@ -716,6 +717,6 @@ export function getTranslatedSteps(lang: LangCode): QuizStep[] {
       ...(o.interstitial && step.interstitial && {
         interstitial: { ...step.interstitial, ...o.interstitial },
       }),
-    }
+    }, lang)
   })
 }
