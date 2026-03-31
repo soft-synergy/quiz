@@ -34,7 +34,7 @@ export default function ResultPage() {
 
           <div className={styles.goalDisplay}>
             <div className={styles.goalWeightLine}>
-              {goalWeight} lbs by {goalDate}
+              {t.goal_line(goalWeight, goalDate)}
             </div>
             <div className={styles.goalTagline}>{t.guide_text}</div>
           </div>

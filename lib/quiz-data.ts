@@ -101,10 +101,10 @@ export const QUIZ_STEPS: QuizStep[] = [
     subtitle: 'You can choose more than one',
     type: 'multi',
     options: [
-      { id: 'lose-weight',   label: 'Lose weight',                     image: '/images/reason1.png' },
-      { id: 'heart-health',  label: 'Improve heart health',            image: '/images/reason2.png' },
-      { id: 'firm-toned',    label: 'Get more toned',                  image: '/images/reason3.png' },
-      { id: 'lower-bio-age', label: 'Feel younger and more energized', image: '/images/reason4.png' },
+      { id: 'lose-weight',   label: 'Lose weight',                     image: '/images/reason-1.png' },
+      { id: 'heart-health',  label: 'Improve heart health',            image: '/images/reason-2.png' },
+      { id: 'firm-toned',    label: 'Get more toned',                  image: '/images/reason-3.png' },
+      { id: 'lower-bio-age', label: 'Feel younger and more energized', image: '/images/reason-4.png' },
     ],
   },
 
@@ -215,7 +215,7 @@ export const QUIZ_STEPS: QuizStep[] = [
     question: 'How often do you exercise?',
     type: 'single',
     options: [
-      { id: 'daily',   label: 'Almost every day',      image: '/images/exercise-1.png' },
+      { id: 'daily',   label: 'Almost every day',      image: '/images/1exercise-1.png' },
       { id: 'weekly',  label: 'A few times per week',  image: '/images/exercise-2.png' },
       { id: 'monthly', label: 'A few times per month', image: '/images/exercise-3.png' },
     ],

@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type LangCode = 'en' | 'pl' | 'de' | 'es' | 'fr' | 'it' | 'pt' | 'ru'
+export type LangCode = 'en' | 'lt' | 'lv' | 'ro' | 'cz' | 'dk' | 'gr' | 'hu' | 'hr' | 'il' | 'jp' | 'ru' | 'sk' | 'tw'
 
 function setCookie(lang: LangCode) {
   if (typeof document !== 'undefined') {

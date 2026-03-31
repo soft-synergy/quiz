@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const VALID_LANGS = new Set(['en', 'pl', 'de', 'es', 'fr', 'it', 'pt', 'ru'])
+const VALID_LANGS = new Set(['en', 'lt', 'lv', 'ro', 'cz', 'dk', 'gr', 'hu', 'hr', 'il', 'jp', 'ru', 'sk', 'tw'])
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

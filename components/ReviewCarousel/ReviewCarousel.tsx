@@ -1,39 +1,118 @@
 'use client'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import styles from './ReviewCarousel.module.css'
+import { useLangStore, type LangCode } from '@/lib/lang-store'
 
-const REVIEWS = [
-  {
-    photo: 'https://i.pravatar.cc/96?img=47',
-    name: 'Debora Lampron',
-    text: 'Ok, so whoever made this a thing I thank you so much! This is making me fit and I think if I do it for the whole month or maybe even just this week I will definitely lose some pounds and burn some belly fat.',
-    stars: 5,
-  },
-  {
-    photo: 'https://i.pravatar.cc/96?img=44',
-    name: 'Samantha Jenkins',
-    text: "I've never really been a fitness person — too much time if you're not motivated. Downloaded this app for the routines. This may sound crazy but my back pain disappeared for the first time in a longer time.",
-    stars: 4,
-  },
-  {
-    photo: 'https://i.pravatar.cc/96?img=53',
-    name: 'James Forrest',
-    text: 'My doctor recommended low-impact exercise and this plan is perfect. The Tai Chi segments are calming and the indoor walking keeps my heart rate up just enough.',
-    stars: 5,
-  },
-  {
-    photo: 'https://i.pravatar.cc/96?img=32',
-    name: 'Maria Santos',
-    text: "Been using this for 3 weeks now and I'm already down 4 pounds! The variety keeps it interesting and I love that I can do it all from my living room regardless of the weather outside.",
-    stars: 5,
-  },
-  {
-    photo: 'https://i.pravatar.cc/96?img=56',
-    name: 'Linda Kowalski',
-    text: 'At 67 years old I thought I was too old to start a new fitness routine. This plan proved me completely wrong. I feel stronger and more flexible than I have in years.',
-    stars: 5,
-  },
+type Review = { photo: string; name: string; text: string; stars: number }
+
+const REVIEW_PHOTOS = [
+  'https://i.pravatar.cc/96?img=47',
+  'https://i.pravatar.cc/96?img=44',
+  'https://i.pravatar.cc/96?img=53',
+  'https://i.pravatar.cc/96?img=32',
+  'https://i.pravatar.cc/96?img=56',
 ]
+
+const REVIEWS: Record<LangCode, Review[]> = {
+  en: [
+    { photo: REVIEW_PHOTOS[0], name: 'Debora Lampron', text: 'Ok, so whoever made this a thing I thank you so much! This is making me fit and I think if I do it for the whole month or maybe even just this week I will definitely lose some pounds and burn some belly fat.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Samantha Jenkins', text: "I've never really been a fitness person, it always felt like too much. I downloaded this for the routines and, as strange as it sounds, my back pain finally eased up for the first time in a long while.", stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'James Forrest', text: 'My doctor recommended low-impact exercise and this plan is perfect. The Tai Chi parts are calming and the indoor walking keeps my heart rate up just enough.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Maria Santos', text: "I've been using this for 3 weeks and I'm already down 4 pounds. The variety keeps it interesting and I love that I can do it all from my living room, no matter the weather.", stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Linda Kowalski', text: 'At 67, I thought I was too old to start a new routine. This plan proved me wrong. I feel stronger and more flexible than I have in years.', stars: 5 },
+  ],
+  lt: [
+    { photo: REVIEW_PHOTOS[0], name: 'Rasa Petrauskienė', text: 'Nuoširdžiai dėkoju tam, kas sukūrė šią programą. Ji padeda man grįžti į formą, o jei tęsiu visą mėnesį, tikrai numesiu svorio ir sumažinsiu pilvo apimtį.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Austėja Jankutė', text: 'Niekada nebuvau sporto žmogus, viskas atrodė per sudėtinga. Atsisiunčiau dėl rutinų, ir, kad ir kaip keistai skambėtų, nugaros skausmas pagaliau sumažėjo.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Mantas Kazlauskas', text: 'Gydytojas rekomendavo mažo krūvio judėjimą, ir šis planas pasirodė idealus. Tai Chi dalys ramina, o ėjimas namuose duoda būtent tiek krūvio, kiek reikia.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Inga Vaitkutė', text: 'Naudoju jau tris savaites ir jau numečiau beveik 2 kilogramus. Įvairovė neleidžia nuobodžiauti, o labiausiai patinka tai, kad viską galiu daryti svetainėje.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Laima Miknevičienė', text: 'Būdama 67-erių maniau, kad naujai rutinai jau per vėlu. Šis planas įrodė priešingai. Jaučiuosi stipresnė ir lankstesnė nei prieš daugelį metų.', stars: 5 },
+  ],
+  lv: [
+    { photo: REVIEW_PHOTOS[0], name: 'Ilze Kalniņa', text: 'Liels paldies tam, kurš šo izveidoja. Šī programma palīdz man atgūt formu, un, ja turpināšu, es tiešām varēšu nomest lieko svaru.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Liene Ozoliņa', text: 'Es nekad nebiju īsts sporta cilvēks, viss šķita pārāk sarežģīti. Lejupielādēju šo rutīnu dēļ, un muguras sāpes beidzot kļuva mazākas.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Andris Bērziņš', text: 'Ārsts ieteica saudzīgas aktivitātes, un šis plāns ir tieši laikā. Tai Chi daļas nomierina, bet pastaigas telpās dod pietiekamu slodzi.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Marta Liepiņa', text: 'Lietoju jau trīs nedēļas un svars jau ir samazinājies. Daudzveidība uztur interesi, un man patīk, ka visu varu darīt mājās.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Aina Mežsarga', text: '67 gados domāju, ka jaunai rutīnai jau ir par vēlu. Izrādījās, ka kļūdījos. Jūtos stiprāka un lokanāka nekā iepriekšējos gados.', stars: 5 },
+  ],
+  ro: [
+    { photo: REVIEW_PHOTOS[0], name: 'Andreea Ionescu', text: 'Îi mulțumesc sincer persoanei care a creat asta. Mă ajută să revin în formă și simt că, dacă continui, voi slăbi în mod real.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Mihaela Popa', text: 'Nu am fost niciodată genul sportiv, totul părea prea complicat. Am descărcat aplicația pentru rutine și, surprinzător, durerile de spate s-au redus.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Radu Marin', text: 'Medicul mi-a recomandat mișcare cu impact redus, iar acest plan este exact ce aveam nevoie. Partea de Tai Chi calmează, iar mersul în interior oferă efortul potrivit.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Cristina Dumitru', text: 'Folosesc programul de trei săptămâni și deja am dat jos aproape 2 kilograme. Îmi place că nu mă plictisesc și că pot face totul din sufragerie.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Elena Stancu', text: 'La 67 de ani credeam că este prea târziu pentru o rutină nouă. Acest plan mi-a demonstrat contrariul. Mă simt mai puternică și mai mobilă decât de mult timp.', stars: 5 },
+  ],
+  cz: [
+    { photo: REVIEW_PHOTOS[0], name: 'Jana Nováková', text: 'Opravdu děkuji tomu, kdo tohle vytvořil. Pomáhá mi to dostat se zpět do formy a mám pocit, že když vydržím, skutečně zhubnu.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Petra Dvořáková', text: 'Nikdy jsem nebyla vyloženě sportovní typ, všechno mi připadalo příliš náročné. Stáhla jsem si to kvůli rutinám a překvapivě mě začala méně bolet záda.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Tomáš Král', text: 'Lékař mi doporučil pohyb s nízkou zátěží a tenhle plán je přesně ono. Tai Chi části uklidňují a domácí chůze dává přesně takovou zátěž, jakou potřebuji.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Lucie Procházková', text: 'Používám to tři týdny a už jsem šla s váhou dolů. Díky různorodosti mě to nepřestává bavit a oceňuji, že vše zvládnu doma.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Marie Benešová', text: 'V 67 letech jsem si myslela, že na novou rutinu už je pozdě. Tenhle plán mi ukázal opak. Cítím se silnější a pohyblivější než za poslední roky.', stars: 5 },
+  ],
+  dk: [
+    { photo: REVIEW_PHOTOS[0], name: 'Mette Jensen', text: 'Jeg er virkelig taknemmelig for den, der har lavet det her. Det hjælper mig tilbage i form, og jeg kan mærke, at det virker, hvis jeg holder fast.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Sanne Nielsen', text: 'Jeg har aldrig været særlig træningsglad, det hele virkede for uoverskueligt. Jeg hentede det for rutinerne, og min ryg har det faktisk bedre nu.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Henrik Larsen', text: 'Min læge anbefalede skånsom motion, og denne plan passer perfekt. Tai Chi-delen giver ro, og den indendørs gang giver lige præcis nok puls.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Camilla Sørensen', text: 'Jeg har brugt det i tre uger og kan allerede mærke forskel. Variationen gør det spændende, og jeg elsker, at jeg kan gøre det hele hjemme i stuen.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Birgit Madsen', text: 'Som 67-årig troede jeg, at det var for sent at begynde på noget nyt. Denne plan beviste det modsatte. Jeg føler mig stærkere og mere smidig end i mange år.', stars: 5 },
+  ],
+  gr: [
+    { photo: REVIEW_PHOTOS[0], name: 'Ελένη Παπαδοπούλου', text: 'Ειλικρινά ευχαριστώ όποιον δημιούργησε αυτή την εφαρμογή. Με βοηθά να ξαναβρώ τη φόρμα μου και νιώθω ότι, αν συνεχίσω, θα δω πραγματική διαφορά.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Μαρία Γεωργίου', text: 'Ποτέ δεν ήμουν ιδιαίτερα του fitness, όλα μου φαίνονταν κουραστικά. Το κατέβασα για τις ρουτίνες και, προς έκπληξή μου, ο πόνος στη μέση μειώθηκε.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Νίκος Δημητρίου', text: 'Ο γιατρός μου πρότεινε άσκηση χαμηλής έντασης και αυτό το πλάνο είναι ιδανικό. Τα μέρη με Tai Chi χαλαρώνουν και το περπάτημα στο σπίτι είναι όσο πρέπει.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Σοφία Κωνσταντίνου', text: 'Το χρησιμοποιώ εδώ και τρεις εβδομάδες και ήδη βλέπω αποτέλεσμα. Η ποικιλία κρατά το ενδιαφέρον μου και μου αρέσει που όλα γίνονται από το σπίτι.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Κατερίνα Σταύρου', text: 'Στα 67 μου πίστευα πως ήταν αργά για μια νέα ρουτίνα. Αυτό το πλάνο μου απέδειξε το αντίθετο. Νιώθω πιο δυνατή και πιο ευλύγιστη από ό,τι εδώ και χρόνια.', stars: 5 },
+  ],
+  hu: [
+    { photo: REVIEW_PHOTOS[0], name: 'Kovács Andrea', text: 'Nagyon hálás vagyok annak, aki ezt létrehozta. Segít visszanyerni a formámat, és érzem, hogy ha kitartok, valóban lesz eredménye.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Nagy Eszter', text: 'Sosem voltam igazi sportos alkat, minden túl soknak tűnt. A rutinok miatt töltöttem le, és meglepő módon a hátfájásom is enyhült.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Tóth Gábor', text: 'Az orvosom kímélő mozgást javasolt, és ez a terv tökéletesnek bizonyult. A Tai Chi részek megnyugtatnak, a benti séta pedig pont elég terhelést ad.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Szabó Katalin', text: 'Három hete használom, és már most érzem a különbséget. A változatosság miatt nem unalmas, és nagyon szeretem, hogy mindent elvégezhetek otthon.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Farkas Ilona', text: '67 évesen azt hittem, már késő új rutinba kezdeni. Ez a terv bebizonyította, hogy tévedtem. Erősebbnek és hajlékonyabbnak érzem magam, mint évek óta.', stars: 5 },
+  ],
+  hr: [
+    { photo: REVIEW_PHOTOS[0], name: 'Marija Kovačević', text: 'Stvarno sam zahvalna osobi koja je ovo osmislila. Pomaže mi da se vratim u formu i osjećam da uz redovitost mogu napraviti veliku promjenu.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Ivana Horvat', text: 'Nikada nisam bila tip za fitness, sve mi je djelovalo prezahtjevno. Preuzela sam ovo zbog rutina i, iskreno, bol u leđima se napokon smanjila.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Marko Babić', text: 'Liječnik mi je preporučio vježbanje s malim opterećenjem i ovaj plan mi savršeno odgovara. Tai Chi dijelovi smiruju, a hodanje u kući daje taman dovoljno aktivnosti.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Ana Radić', text: 'Koristim ovo već tri tjedna i već osjećam pomak. Raznolikost održava motivaciju, a posebno mi odgovara što sve mogu odraditi kod kuće.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Vesna Jurić', text: 'Sa 67 godina mislila sam da je prekasno za novu rutinu. Ovaj plan me potpuno razuvjerio. Osjećam se snažnije i pokretljivije nego godinama prije.', stars: 5 },
+  ],
+  il: [
+    { photo: REVIEW_PHOTOS[0], name: 'יעל כהן', text: 'אני ממש מודה למי שיצר את זה. זה עוזר לי לחזור לכושר, ואני מרגישה שאם אתמיד, באמת אראה שינוי.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'מיכל לוי', text: 'מעולם לא הייתי טיפוס של כושר, הכול הרגיש לי גדול מדי. הורדתי את זה בגלל השגרות, ובאופן מפתיע גם כאב הגב שלי נרגע.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'אורי פרידמן', text: 'הרופא שלי המליץ על פעילות עדינה, והתוכנית הזו ממש מתאימה. קטעי ה-Tai Chi מרגיעים, וההליכה בבית נותנת בדיוק את המאמץ הנכון.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'שירה אברהם', text: 'אני משתמשת בזה כבר שלושה שבועות וכבר מרגישה שינוי. יש מספיק גיוון כדי שלא ישעמם, והכי טוב שאפשר לעשות הכול מהסלון.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'רות בן דוד', text: 'בגיל 67 חשבתי שכבר מאוחר להתחיל שגרה חדשה. התוכנית הזו הוכיחה לי אחרת. אני מרגישה חזקה וגמישה יותר מאשר במשך שנים.', stars: 5 },
+  ],
+  jp: [
+    { photo: REVIEW_PHOTOS[0], name: '高橋 真理子', text: 'これを作ってくれた人に本当に感謝しています。無理なく体を動かせて、続ければきちんと変われそうだと感じています。', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: '佐藤 直子', text: '私はもともと運動が得意ではなく、何を始めても負担に感じていました。でもこのルーティンは続けやすく、腰のつらさも少し楽になりました。', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: '山本 恒一', text: '医師に負担の少ない運動を勧められて、このプランを始めました。Tai Chiの動きは気持ちが落ち着き、室内ウォーキングも自分にちょうどいい強さです。', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: '中村 由美', text: '使い始めて3週間ですが、もう体の感覚が変わってきました。内容に変化があるので飽きにくく、家で全部できるのが本当に助かります。', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: '木村 恒一', text: '67歳で新しい習慣を始めるのは遅いと思っていました。でもこのプランで考えが変わりました。ここ数年でいちばん体が軽く、動きやすいです。', stars: 5 },
+  ],
+  ru: [
+    { photo: REVIEW_PHOTOS[0], name: 'Елена Смирнова', text: 'Хочу сказать большое спасибо тому, кто это придумал. Программа помогает мне возвращаться в форму, и я чувствую, что при регулярности результат точно будет.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Анна Кузнецова', text: 'Я никогда не была особенно спортивной, всё казалось слишком сложным. Скачала ради простых занятий, и, что удивительно, спина стала беспокоить заметно меньше.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Алексей Волков', text: 'Врач рекомендовал мне щадящую нагрузку, и этот план подошёл идеально. Части с Тай Чи успокаивают, а ходьба дома даёт именно ту активность, которая нужна.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Марина Орлова', text: 'Пользуюсь уже три недели и уже вижу сдвиг. Мне нравится, что программа не надоедает, а все упражнения можно делать прямо дома.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Наталья Белова', text: 'В 67 лет я думала, что начинать новую привычку уже поздно. Этот план доказал обратное. Я чувствую себя сильнее и подвижнее, чем за последние годы.', stars: 5 },
+  ],
+  sk: [
+    { photo: REVIEW_PHOTOS[0], name: 'Jana Kováčová', text: 'Naozaj ďakujem tomu, kto toto vytvoril. Pomáha mi dostať sa späť do formy a mám pocit, že keď vydržím, výsledky sa určite dostavia.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Petra Novotná', text: 'Nikdy som nebola veľmi športový typ, všetko sa mi zdalo príliš náročné. Stiahla som si to kvôli rutinám a prekvapilo ma, že ma prestal tak trápiť chrbát.', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: 'Martin Horváth', text: 'Lekár mi odporučil pohyb s nízkou záťažou a tento plán je presne to, čo som potreboval. Tai Chi časti upokojujú a domáca chôdza dáva primeranú záťaž.', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: 'Lucia Šimková', text: 'Používam to už tri týždne a už teraz cítim rozdiel. Vďaka pestrosti ma to baví a najviac oceňujem, že všetko zvládnem doma.', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: 'Mária Benková', text: 'V 67 rokoch som si myslela, že je neskoro začínať s novou rutinou. Tento plán mi ukázal opak. Cítim sa silnejšia a pohyblivejšia než za posledné roky.', stars: 5 },
+  ],
+  tw: [
+    { photo: REVIEW_PHOTOS[0], name: '林雅婷', text: '真的很想謝謝做出這套內容的人。它讓我比較容易重新動起來，我也感覺只要持續下去，真的會看到改變。', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: '陳怡君', text: '我以前不是那種會主動運動的人，總覺得太麻煩。因為想跟著簡單的流程試試看才下載，結果連背部不適都減輕了。', stars: 4 },
+    { photo: REVIEW_PHOTOS[2], name: '張志豪', text: '醫師建議我做低衝擊運動，這個計畫真的很適合。Tai Chi 的段落很放鬆，室內步行的強度也剛剛好。', stars: 5 },
+    { photo: REVIEW_PHOTOS[3], name: '黃美玲', text: '用了三週之後，我已經明顯感覺到變化。內容不單調，而且最棒的是全部都能在家完成。', stars: 5 },
+    { photo: REVIEW_PHOTOS[4], name: '吳淑芬', text: '67 歲時我以為自己已經不適合開始新的習慣了，結果這個計畫完全改變了我的想法。這幾年來我第一次覺得自己更有力氣，也更靈活。', stars: 5 },
+  ],
+}
 
 const GAP = 12
 
@@ -56,12 +135,16 @@ function Avatar({ src, alt }: { src: string; alt: string }) {
 }
 
 export default function ReviewCarousel() {
+  const lang = useLangStore((s) => s.lang)
+  const reviews = REVIEWS[lang] ?? REVIEWS.en
+  const reviewsLabel = lang === 'jp' ? 'お客様のレビュー' : lang === 'ru' ? 'Отзывы пользователей' : lang === 'tw' ? '用戶評價' : lang === 'il' ? 'ביקורות משתמשים' : lang === 'lt' ? 'Klientų atsiliepimai' : 'Customer reviews'
+  const trustpilotLabel = lang === 'jp' ? 'Trustpilot' : lang === 'ru' ? 'Trustpilot' : lang === 'tw' ? 'Trustpilot' : lang === 'il' ? 'Trustpilot' : lang === 'lt' ? 'Trustpilot' : 'Trustpilot'
   const outerRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [activeIdx, setActiveIdx] = useState(0)
 
   const goTo = useCallback((idx: number) => {
-    const next = ((idx % REVIEWS.length) + REVIEWS.length) % REVIEWS.length
+    const next = ((idx % reviews.length) + reviews.length) % reviews.length
     setActiveIdx(next)
 
     if (!trackRef.current || !outerRef.current) return
@@ -75,31 +158,32 @@ export default function ReviewCarousel() {
     const centerOffset = (containerW - cardW) / 2
     const offset = centerOffset - next * (cardW + GAP)
     trackRef.current.style.transform = `translateX(${offset}px)`
-  }, [])
+  }, [reviews.length])
 
   useEffect(() => {
+    setActiveIdx(0)
     goTo(0)
     const handleResize = () => goTo(activeIdx)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goTo])
+  }, [goTo, lang])
 
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveIdx(i => {
-        const next = (i + 1) % REVIEWS.length
+        const next = (i + 1) % reviews.length
         goTo(next)
         return next
       })
     }, 4000)
     return () => clearInterval(timer)
-  }, [goTo])
+  }, [goTo, reviews.length])
 
   return (
-    <div ref={outerRef} className={styles.outer} aria-label="Customer reviews">
+    <div ref={outerRef} className={styles.outer} aria-label={reviewsLabel}>
       <div ref={trackRef} className={styles.track}>
-        {REVIEWS.map((r, i) => (
+        {reviews.map((r, i) => (
           <div
             key={i}
             data-card={i}
@@ -114,7 +198,7 @@ export default function ReviewCarousel() {
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="#00B67A">
                   <path d="M12 2l2.9 8.9H23l-7.4 5.4 2.8 8.9L12 20l-6.4 4.6 2.8-8.9L1 10.9h8.1z" />
                 </svg>
-                <span className={styles.tpText}>Trustpilot</span>
+                <span className={styles.tpText}>{trustpilotLabel}</span>
               </div>
             </div>
             <div className={styles.stars}>
