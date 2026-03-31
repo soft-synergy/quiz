@@ -8,6 +8,7 @@ import ReviewCarousel from '@/components/ReviewCarousel/ReviewCarousel'
 import { useQuizStore } from '@/lib/quiz-store'
 import type { LangCode } from '@/lib/lang-store'
 import { useLoadingT } from '@/lib/i18n'
+import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
 
 export default function LoadingPage() {
   const router = useRouter()

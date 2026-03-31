@@ -7,6 +7,7 @@ import QuizFooter from '@/components/QuizFooter/QuizFooter'
 import { useQuizStore } from '@/lib/quiz-store'
 import type { LangCode } from '@/lib/lang-store'
 import { useEmailT } from '@/lib/i18n'
+import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
 
 export default function EmailPage() {
   const router = useRouter()

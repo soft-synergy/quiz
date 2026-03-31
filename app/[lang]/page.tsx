@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
 import { useIntroT, LANGUAGES } from '@/lib/i18n'
+import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
 import LangPicker from '@/components/LangPicker/LangPicker'
 
 const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
@@ -20,7 +21,8 @@ export default function IntroLangPage() {
   const lang = langParam as LangCode
   const { setLang } = useLangStore()
   const { setAge, setDirection, reset } = useQuizStore()
-  const t = useIntroT(lang)
+  const _ov = useTranslationOverrides(lang)
+  const t = applyFlatSection(useIntroT(lang), _ov, 'intro.')
   const [consentChecked, setConsentChecked] = useState(false)
   const [consentError, setConsentError] = useState(false)
   const [personImgLoaded, setPersonImgLoaded] = useState(false)

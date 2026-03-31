@@ -7,6 +7,7 @@ import WeightChart from '@/components/WeightChart/WeightChart'
 import { useQuizStore } from '@/lib/quiz-store'
 import type { LangCode } from '@/lib/lang-store'
 import { useResultT } from '@/lib/i18n'
+import { useTranslationOverrides, applyResultOverrides } from '@/lib/use-translation-overrides'
 import { getGoalDate } from '@/lib/bmi-utils'
 
 export default function ResultPage() {

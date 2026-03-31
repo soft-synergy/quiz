@@ -6,6 +6,7 @@ import QuizFooter from '@/components/QuizFooter/QuizFooter'
 import { useQuizStore } from '@/lib/quiz-store'
 import type { LangCode } from '@/lib/lang-store'
 import { useResults28T } from '@/lib/i18n'
+import { useTranslationOverrides, applyResults28Overrides } from '@/lib/use-translation-overrides'
 
 function WeightCurve({ t }: { t: ReturnType<typeof useResults28T> }) {
   return (

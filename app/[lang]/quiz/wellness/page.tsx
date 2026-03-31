@@ -8,6 +8,7 @@ import BMIScale from '@/components/BMIScale/BMIScale'
 import { useQuizStore } from '@/lib/quiz-store'
 import type { LangCode } from '@/lib/lang-store'
 import { useWellnessT } from '@/lib/i18n'
+import { useTranslationOverrides, applyWellnessOverrides } from '@/lib/use-translation-overrides'
 import { calcBMI, getBMICategory } from '@/lib/bmi-utils'
 
 export default function WellnessPage() {
