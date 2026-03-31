@@ -686,9 +686,9 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
         </div>
         <span className={styles.consentText}>
           {copy.consentPrefix}{' '}
-          <a href="/terms" onClick={(e) => e.stopPropagation()}>{copy.terms}</a>,{' '}
-          <a href="/privacy-policy" onClick={(e) => e.stopPropagation()}>{copy.privacy}</a>, and{' '}
-          <a href="/refund" onClick={(e) => e.stopPropagation()}>{copy.refund}</a>.{' '}
+          <a href="https://www.taichiwalkingcoach.com/en-tcwalk-terms-of-services" onClick={(e) => e.stopPropagation()}>{copy.terms}</a>,{' '}
+          <a href="https://www.taichiwalkingcoach.com/en-tcwalk-privacy-policy" onClick={(e) => e.stopPropagation()}>{copy.privacy}</a>, and{' '}
+          <a href="https://www.taichiwalkingcoach.com/en-tcwalk-money-back-guarantee" onClick={(e) => e.stopPropagation()}>{copy.refund}</a>.{' '}
           {copy.consentBody(selectedPlan.total, selectedPlan.origTotal)}{' '}
           <a href="mailto:hello@taichiwalkingcoach.app" onClick={(e) => e.stopPropagation()}>hello@taichiwalkingcoach.app</a>
         </span>
@@ -891,11 +891,11 @@ export default function PaywallPage() {
             <h2 className={styles.guaranteeTitle}>{copy.guaranteeTitle}</h2>
             <p className={styles.guaranteeBody}>{copy.guaranteeBody}</p>
             <div className={styles.guaranteeLinks}>
-              <a href="/terms">{copy.terms}</a>
+              <a href="https://www.taichiwalkingcoach.com/en-tcwalk-terms-of-services">{copy.terms}</a>
               <span>|</span>
-              <a href="/privacy-policy">{copy.privacy}</a>
+              <a href="https://www.taichiwalkingcoach.com/en-tcwalk-privacy-policy">{copy.privacy}</a>
               <span>|</span>
-              <a href="/refund">{copy.refund}</a>
+              <a href="https://www.taichiwalkingcoach.com/en-tcwalk-money-back-guarantee">{copy.refund}</a>
             </div>
           </div>
 

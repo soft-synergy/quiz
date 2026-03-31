@@ -463,7 +463,7 @@ function StepContent({
               </div>
               <span className={styles.consentText}>
                 {t.consent_text}{' '}
-                <a href="/privacy-policy" onClick={(e) => e.stopPropagation()}>{t.consent_privacy_link}</a>
+                <a href="https://www.taichiwalkingcoach.com/en-tcwalk-privacy-policy" onClick={(e) => e.stopPropagation()}>{t.consent_privacy_link}</a>
               </span>
             </div>
           )}

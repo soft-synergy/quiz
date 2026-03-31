@@ -24,7 +24,7 @@ export default function EmailPage() {
 
   const privacyNote = t.privacy_note.replace(
     '{link}',
-    `<a href="/privacy-policy" class="${styles.privacyLink}">${t.privacy_link}</a>`
+    `<a href="https://www.taichiwalkingcoach.com/en-tcwalk-privacy-policy" class="${styles.privacyLink}">${t.privacy_link}</a>`
   )
 
   return (

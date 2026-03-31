@@ -141,10 +141,10 @@ export default function IntroLangPage() {
           </div>
           <p className={styles.consentText}>
             {t.consent_prefix}{' '}
-            <a href="#">{t.consent_tos}</a>{t.consent_comma}{' '}
-            <a href="#">{t.consent_cookie}</a>{t.consent_comma}{' '}
+            <a href="https://www.taichiwalkingcoach.com/en-tcwalk-terms-of-services">{t.consent_tos}</a>{t.consent_comma}{' '}
+            <a href="https://www.taichiwalkingcoach.com/en-tcwalk-cookie-policy">{t.consent_cookie}</a>{t.consent_comma}{' '}
             {t.consent_and}{' '}
-            <a href="/privacy-policy">{t.consent_privacy}</a>.
+            <a href="https://www.taichiwalkingcoach.com/en-tcwalk-privacy-policy">{t.consent_privacy}</a>.
           </p>
         </div>
         {consentError && (
