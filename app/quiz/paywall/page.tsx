@@ -714,7 +714,7 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
   )
 }
 
-export default function PaywallPage({ checkoutSlug = 'checkout' }: { checkoutSlug?: string }) {
+export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: string }) {
   const { answers, _hydrated } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
   const copy = localizeBrandValue(COPY[lang] ?? EN, lang)
@@ -928,4 +928,8 @@ export default function PaywallPage({ checkoutSlug = 'checkout' }: { checkoutSlu
       </main>
     </>
   )
+}
+
+export default function PaywallPage() {
+  return <PaywallContent checkoutSlug="checkout" />
 }
