@@ -100,7 +100,16 @@ export default function WellnessPage() {
             </div>
 
             <div className={styles.profilePerson} aria-hidden="true">
-              <img src="/images/Shutterstock_2565519625+1+(1).png" alt={t.img_alt} width={160} height={200} />
+              <img
+                src={
+                  bmiCategory === 'Obese'       ? '/images/obese.png' :
+                  bmiCategory === 'Overweight'  ? '/images/overweight.png' :
+                                                  '/images/normal.png'
+                }
+                alt={t.img_alt}
+                width={160}
+                height={200}
+              />
             </div>
           </div>
 
