@@ -172,6 +172,27 @@ export function applyWellnessOverrides(
   }
 }
 
+/** paywall — flat string-only keys with personalHeading using __NAME__ placeholder */
+export function applyPaywallOverrides<T extends Record<string, unknown>>(
+  copy: T,
+  ov: Record<string, string>
+): T {
+  const prefix = 'paywall.'
+  const entries = Object.entries(ov).filter(([k]) => k.startsWith(prefix))
+  if (!entries.length) return copy
+  const patch: Record<string, unknown> = {}
+  for (const [k, v] of entries) {
+    const key = k.slice(prefix.length)
+    if (key === 'personalHeading') {
+      patch[key] = (name: string) =>
+        name ? v.replace('__NAME__', name) : v.replace(/^__NAME__[,，、]?\s*/, '')
+    } else {
+      patch[key] = v
+    }
+  }
+  return { ...(copy as object), ...patch } as T
+}
+
 /** quiz steps */
 export function applyStepOverrides(step: QuizStep, ov: Record<string, string>): QuizStep {
   const pfx = `steps.${step.step}.`

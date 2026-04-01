@@ -41,6 +41,7 @@ type Section =
   | 'Loading'
   | 'Email'
   | 'Quiz Steps'
+  | 'Paywall'
 
 const SECTION_PREFIXES: Record<Section, string> = {
   Intro: 'intro.',
@@ -52,6 +53,7 @@ const SECTION_PREFIXES: Record<Section, string> = {
   Loading: 'loading.',
   Email: 'email.',
   'Quiz Steps': 'steps.',
+  Paywall: 'paywall.',
 }
 
 const ALL_SECTIONS: Section[] = [
@@ -64,6 +66,7 @@ const ALL_SECTIONS: Section[] = [
   '28-Day',
   'Email',
   'UI',
+  'Paywall',
 ]
 
 function filterBySection(data: Record<string, string>, section: Section): Record<string, string> {
@@ -848,6 +851,24 @@ export default function TranslationEditorPage() {
       </div>
 
       {/* Placeholder note */}
+      {section === 'Paywall' && (
+        <div
+          style={{
+            background: '#eff6ff',
+            borderBottom: '1px solid #dbeafe',
+            padding: '8px 24px',
+          }}
+        >
+          <div style={{ maxWidth: 1400, margin: '0 auto', fontSize: 12, color: '#1d4ed8' }}>
+            Placeholders:{' '}
+            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>
+              __NAME__
+            </code>{' '}
+            in <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>personalHeading</code>{' '}
+            — will be replaced with the user&apos;s name at runtime.
+          </div>
+        </div>
+      )}
       {(section === 'Step Page' || section === 'Result' || section === '28-Day') && (
         <div
           style={{

@@ -146,6 +146,26 @@ function flatten(obj: Record<string, unknown>, prefix = ''): Record<string, stri
   return result
 }
 
+function serializePaywall(): Record<string, string> {
+  return {
+    'paywall.pageTitle': 'Choose your plan with TAICHI COACH',
+    'paywall.pageSub': 'Simple, guided, and made for real life.',
+    'paywall.cta': 'Get my Tai Chi Coach',
+    'paywall.moneyBackRow': '30-day money-back guarantee — Try it with no risk. If it is not right for you, you can get your money back.',
+    'paywall.readyHeading': 'Your plan with TAICHI COACH is ready!',
+    'paywall.bulletTitle': 'With TAICHI COACH, you can:',
+    'paywall.whatYouGet': 'What you get with TAICHI COACH',
+    'paywall.storiesHeading': 'Real stories from people using TAICHI COACH',
+    'paywall.personalHeading': 'Build real results at your own pace',
+    'paywall.guaranteeTitle': '28-Day Money-Back Guarantee',
+    'paywall.guaranteeBody': 'Try TAICHI COACH with no risk. If it is not the right fit for you, you can request a refund within 28 days. Please check our Refund Policy for full details.',
+    'paywall.footer': '© 2026 TAICHI COACH. All rights reserved.',
+    'paywall.socialText': 'Millions of people have already tried simple daily movement routines',
+    'paywall.socialSub': 'And many have seen real progress over time.',
+    'paywall.socialCta': 'Get started now',
+  }
+}
+
 function serializeAll(lang: LangCode): Record<string, string> {
   const intro = useIntroT(lang)
   const ui = useUITranslations(lang)
@@ -185,6 +205,8 @@ function serializeAll(lang: LangCode): Record<string, string> {
     Object.assign(stepsFlat, stepFlat)
   }
 
+  const paywallFlat = serializePaywall()
+
   return {
     ...introFlat,
     ...uiFlat,
@@ -195,6 +217,7 @@ function serializeAll(lang: LangCode): Record<string, string> {
     ...loadingFlat,
     ...emailFlat,
     ...stepsFlat,
+    ...paywallFlat,
   }
 }
 

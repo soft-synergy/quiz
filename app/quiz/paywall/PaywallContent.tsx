@@ -10,6 +10,7 @@ import { useLangStore, type LangCode } from '@/lib/lang-store'
 import { localizeBrandValue } from '@/lib/brand'
 import { LANGUAGES } from '@/lib/i18n'
 import { REVIEWS } from '@/components/ReviewCarousel/ReviewCarousel'
+import { useTranslationOverrides, applyPaywallOverrides } from '@/lib/use-translation-overrides'
 
 const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
 
@@ -31,6 +32,8 @@ type Copy = {
   terms: string
   privacy: string
   refund: string
+  consentAnd: string
+  consentError: string
   consentBody: (today: string, renew: string) => string
   yourResults: string
   primaryGoal: string
@@ -78,6 +81,8 @@ const EN: Copy = {
   terms: 'Terms of Use',
   privacy: 'Privacy Policy',
   refund: 'Refund Policy',
+  consentAnd: 'and',
+  consentError: 'Please accept the terms to continue.',
   consentBody: (today, renew) => `This is a subscription that renews automatically. You will be charged ${today} today. After the plan period ends, your plan will renew at ${renew}, unless you cancel. You can cancel anytime at least 48 hours before renewal by contacting support email:`,
   yourResults: 'Your results',
   primaryGoal: 'PRIMARY GOAL',
@@ -164,6 +169,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Naudojimo sąlygomis',
     privacy: 'Privatumo politika',
     refund: 'Pinigų grąžinimo politika',
+    consentAnd: 'ir',
+    consentError: 'Norėdami tęsti, turite priimti sąlygas.',
     consentBody: (today, renew) => `Tai automatiškai atnaujinama prenumerata. Šiandien bus nuskaičiuota ${today}. Pasibaigus laikotarpiui, prenumerata bus atnaujinta už ${renew}, jei jos neatšauksite. Atsisakyti galite bet kada, likus bent 48 valandoms iki atnaujinimo, parašę el. paštu:`,
     yourResults: 'Jūsų rezultatai',
     primaryGoal: 'PAGRINDINIS TIKSLAS',
@@ -188,6 +195,14 @@ const COPY: Record<LangCode, Copy> = {
     guaranteeBody: 'Išbandykite TAICHI COACH be rizikos. Jei planas jums netiks, per 28 dienas galėsite prašyti pinigų grąžinimo. Daugiau informacijos rasite pinigų grąžinimo politikoje.',
     footer: '© 2026 TAICHI COACH. Visos teisės saugomos.',
     goalLabels: { 'lose-weight': 'Numesti svorio', 'heart-health': 'Pagerinti širdies sveikatą', 'firm-toned': 'Tapti stangresniam', 'lower-bio-age': 'Jaustis jaunesniam ir energingesniam' },
+    sleepLabels: { 'less-than-5': 'Bloga', '<5': 'Bloga', '5-6': 'Reikia pagerinti', '7-8': 'Gera', '8-9': 'Gera', '9+': 'Galėtų būti geriau' },
+    fitnessLabels: { sedentary: 'Žemas', 'lightly-active': 'Žemas', light: 'Žemas', moderate: 'Vidutinis', intermediate: 'Vidutinis', active: 'Aukštas', 'very-active': 'Aukštas', advanced: 'Aukštas' },
+    bmi: {
+      Normal: { title: 'Geras pradinis taškas', text: (b) => `Jūsų KMI yra ${b}, o tai yra normaliame diapazone. Esate tinkamame kelyje. Planas bus pritaikytas prie jūsų poreikių ir padės išlaikyti pažangą.` },
+      Underweight: { title: 'Geras pradinis taškas', text: (b) => `Jūsų KMI yra ${b}, o tai yra žemiau įprasto diapazono. Planas bus orientuotas į jėgos ugdymą ir subalansuotą mitybą.` },
+      Overweight: { title: 'Geras metas pokyčiams', text: (b) => `Jūsų KMI yra ${b}. Tinkama rutina gali padėti geriau jaustis savo kūne. Vesime jus žingsnis po žingsnio su planu, pritaikytu jūsų kasdieniam gyvenimui.` },
+      Obese: { title: 'Geras laikas rūpintis savo kūnu', text: (b) => `Jūsų KMI yra ${b}. Su tinkamu planu galite pagerinti kūno savijautą ir judrumą. Vesime jus mažais, paprastais žingsniais, kurie tinka kasdieniam gyvenimui.` },
+    },
   }),
   lv: localize(EN, {
     plans: [
@@ -205,6 +220,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Lietošanas noteikumiem',
     privacy: 'Privātuma politikai',
     refund: 'Atmaksas politikai',
+    consentAnd: 'un',
+    consentError: 'Lai turpinātu, lūdzu, akceptējiet noteikumus.',
     consentBody: (today, renew) => `Šis ir abonements ar automātisku atjaunošanu. Šodien jums tiks piemērots maksājums ${today}. Pēc plāna perioda beigām abonements tiks atjaunots par ${renew}, ja to neatcelsiet. To varat atcelt jebkurā laikā, vismaz 48 stundas pirms atjaunošanas, rakstot uz:`,
     yourResults: 'Jūsu rezultāti',
     primaryGoal: 'GALVENAIS MĒRĶIS',
@@ -235,6 +252,14 @@ const COPY: Record<LangCode, Copy> = {
     guaranteeBody: 'Izmēģiniet TAICHI COACH bez riska. Ja tas jums nebūs piemērots, 28 dienu laikā varēsiet pieprasīt atmaksu. Plašāka informācija pieejama atmaksas politikā.',
     footer: '© 2026 TAICHI COACH. Visas tiesības aizsargātas.',
     goalLabels: { 'lose-weight': 'Samazināt svaru', 'heart-health': 'Uzlabot sirds veselību', 'firm-toned': 'Kļūt tvirtākam', 'lower-bio-age': 'Justies jaunākam un enerģiskākam' },
+    sleepLabels: { 'less-than-5': 'Slikta', '<5': 'Slikta', '5-6': 'Jāuzlabo', '7-8': 'Laba', '8-9': 'Laba', '9+': 'Varētu būt labāka' },
+    fitnessLabels: { sedentary: 'Zems', 'lightly-active': 'Zems', light: 'Zems', moderate: 'Vidējs', intermediate: 'Vidējs', active: 'Augsts', 'very-active': 'Augsts', advanced: 'Augsts' },
+    bmi: {
+      Normal: { title: 'Labs sākuma punkts', text: (b) => `Jūsu ĶMI ir ${b}, kas ir normālajā diapazonā. Jūs esat pareizajā ceļā. Plāns tiks pielāgots jūsu vajadzībām un palīdzēs saglabāt progresu.` },
+      Underweight: { title: 'Labs sākuma punkts', text: (b) => `Jūsu ĶMI ir ${b}, kas ir zemāks par parasto diapazonu. Plāns koncentrēsies uz spēka veidošanu un sabalansētu uzturu.` },
+      Overweight: { title: 'Labs laiks pārmaiņām', text: (b) => `Jūsu ĶMI ir ${b}. Ar pareizu rutīnu varat uzlabot sava ķermeņa sajūtu. Mēs vadīsim jūs soli pa solim ar plānu, kas iekļaujas jūsu ikdienā.` },
+      Obese: { title: 'Labs laiks rūpēties par savu ķermeni', text: (b) => `Jūsu ĶMI ir ${b}. Ar pareizu plānu varat uzlabot, kā jūsu ķermenis jūtas un kustās. Mēs vadīsim jūs ar maziem, vienkāršiem soļiem, kas der ikdienai.` },
+    },
   }),
   ro: localize(EN, {
     plans: [
@@ -252,6 +277,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Termenii de utilizare',
     privacy: 'Politica de confidențialitate',
     refund: 'Politica de rambursare',
+    consentAnd: 'și',
+    consentError: 'Vă rugăm să acceptați termenii pentru a continua.',
     consentBody: (today, renew) => `Acesta este un abonament cu reînnoire automată. Astăzi vi se va percepe ${today}. După încheierea perioadei, abonamentul se va reînnoi la ${renew}, dacă nu îl anulați. Îl puteți anula oricând, cu cel puțin 48 de ore înainte de reînnoire, scriind la:`,
     yourResults: 'Rezultatele dumneavoastră',
     primaryGoal: 'OBIECTIV PRINCIPAL',
@@ -282,6 +309,14 @@ const COPY: Record<LangCode, Copy> = {
     guaranteeBody: 'Încercați TAICHI COACH fără risc. Dacă nu este potrivit pentru dumneavoastră, puteți cere rambursarea în 28 de zile. Consultați politica de rambursare pentru detalii complete.',
     footer: '© 2026 TAICHI COACH. Toate drepturile rezervate.',
     goalLabels: { 'lose-weight': 'Să slăbesc', 'heart-health': 'Să îmbunătățesc sănătatea inimii', 'firm-toned': 'Să fiu mai tonifiat', 'lower-bio-age': 'Să mă simt mai tânăr și mai energic' },
+    sleepLabels: { 'less-than-5': 'Slabă', '<5': 'Slabă', '5-6': 'Necesită îmbunătățire', '7-8': 'Bună', '8-9': 'Bună', '9+': 'Ar putea fi mai bună' },
+    fitnessLabels: { sedentary: 'Scăzut', 'lightly-active': 'Scăzut', light: 'Scăzut', moderate: 'Mediu', intermediate: 'Mediu', active: 'Ridicat', 'very-active': 'Ridicat', advanced: 'Ridicat' },
+    bmi: {
+      Normal: { title: 'Un bun punct de plecare', text: (b) => `IMC-ul dumneavoastră este ${b}, ceea ce se află în intervalul normal. Sunteți pe drumul cel bun. Planul va fi adaptat nevoilor dumneavoastră și vă va ajuta să mențineți progresul.` },
+      Underweight: { title: 'Un bun punct de plecare', text: (b) => `IMC-ul dumneavoastră este ${b}, ceea ce este sub intervalul obișnuit. Planul se va concentra pe creșterea forței și pe o nutriție echilibrată.` },
+      Overweight: { title: 'Un bun moment pentru schimbare', text: (b) => `IMC-ul dumneavoastră este ${b}. Cu rutina potrivită, puteți îmbunătăți modul în care vă simțiți în corpul dumneavoastră. Vă vom ghida pas cu pas cu un plan adaptat vieții de zi cu zi.` },
+      Obese: { title: 'Un bun moment să aveți grijă de corpul dumneavoastră', text: (b) => `IMC-ul dumneavoastră este ${b}. Cu planul potrivit, puteți îmbunătăți felul în care corpul dumneavoastră se simte și se mișcă. Vă vom ghida cu pași mici și simpli, care se potrivesc vieții cotidiene.` },
+    },
   }),
   cz: localize(EN, {
     plans: [
@@ -299,6 +334,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Podmínkami použití',
     privacy: 'Zásadami ochrany osobních údajů',
     refund: 'Zásadami vrácení peněz',
+    consentAnd: 'a',
+    consentError: 'Prosím, přijměte podmínky, abyste mohli pokračovat.',
     consentBody: (today, renew) => `Jedná se o předplatné s automatickým obnovením. Dnes vám bude účtováno ${today}. Po skončení období se plán obnoví za ${renew}, pokud ho nezrušíte. Zrušit ho můžete kdykoli, nejpozději 48 hodin před obnovením, na e-mailu:`,
     yourResults: 'Vaše výsledky',
     primaryGoal: 'HLAVNÍ CÍL',
@@ -353,6 +390,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Brugsvilkår',
     privacy: 'Privatlivspolitik',
     refund: 'Refusionspolitik',
+    consentAnd: 'og',
+    consentError: 'Accepter venligst betingelserne for at fortsætte.',
     consentBody: (today, renew) => `Dette er et abonnement med automatisk fornyelse. I dag bliver der trukket ${today}. Når perioden slutter, fornyes planen til ${renew}, medmindre I opsiger den. I kan opsige når som helst senest 48 timer før fornyelse via:`,
     yourResults: 'Jeres resultater',
     primaryGoal: 'PRIMÆRT MÅL',
@@ -368,6 +407,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'Med TAICHI COACH kan I:',
     bullets: ['Styrke jeres selvtillid', 'Få mere energi', 'Slappe af og reducere stress', 'Støtte kroppen over tid'],
     whatYouGet: 'Det får I med TAICHI COACH',
+    features: [
+      { title: 'Et personaliseret bevægelsessystem', desc: 'Jeres plan er bygget op om jeres krop, energi og hverdag — ikke en generisk rutine.' },
+      { title: 'Klar daglig retning', desc: 'I ved altid, hvad I skal gøre i dag, uden at tænke eller planlægge.' },
+      { title: 'Tilpasningsdygtig vejledning, der følger jer', desc: 'Jeres plan justeres undervejs — baseret på jeres fremskridt, energi og regelmæssighed.' },
+      { title: 'Støtte, når I har mest brug for det', desc: 'Hvis I føler jer fastlåst, trætte eller springer en dag over — hjælper jeres plan jer tilbage på sporet.' },
+    ],
+    socialText: 'Millioner af mennesker har allerede prøvet enkle daglige bevægelsesrutiner',
+    socialSub: 'Og mange har oplevet reel fremgang over tid.',
+    socialCta: 'Kom i gang nu',
+    storiesHeading: 'Rigtige historier fra folk, der bruger TAICHI COACH',
+    personalHeading: (name) => `${name ? `${name}, opbyg` : 'Opbyg'} rigtige resultater i dit eget tempo`,
+    guaranteeTitle: '28-dages pengene-tilbage-garanti',
+    guaranteeBody: 'Prøv TAICHI COACH uden risiko. Hvis det ikke er det rigtige for jer, kan I anmode om refusion inden for 28 dage. Se vores refusionspolitik for alle detaljer.',
+    footer: '© 2026 TAICHI COACH. Alle rettigheder forbeholdes.',
+    goalLabels: { 'lose-weight': 'Tabe sig', 'heart-health': 'Forbedre hjertesundheden', 'firm-toned': 'Blive mere tonet', 'lower-bio-age': 'Føle sig yngre og energisk' },
+    sleepLabels: { 'less-than-5': 'Dårlig', '<5': 'Dårlig', '5-6': 'Behøver forbedring', '7-8': 'God', '8-9': 'God', '9+': 'Kan være bedre' },
+    fitnessLabels: { sedentary: 'Lav', 'lightly-active': 'Lav', light: 'Lav', moderate: 'Middel', intermediate: 'Middel', active: 'Høj', 'very-active': 'Høj', advanced: 'Høj' },
+    bmi: {
+      Normal: { title: 'Et godt udgangspunkt', text: (b) => `Jeres BMI er ${b}, hvilket er i normalområdet. I er på rette spor. Jeres plan tilpasses jeres behov og hjælper jer med at fastholde fremgangen.` },
+      Underweight: { title: 'Et godt udgangspunkt', text: (b) => `Jeres BMI er ${b}, hvilket er under det sædvanlige område. Jeres plan vil fokusere på at opbygge styrke og afbalanceret ernæring.` },
+      Overweight: { title: 'Et godt tidspunkt at foretage en ændring', text: (b) => `Jeres BMI er ${b}. Med den rette rutine kan I forbedre, hvordan kroppen føles. Vi guider jer trin for trin med en plan, der passer til jeres hverdag.` },
+      Obese: { title: 'Et godt tidspunkt at tage hånd om kroppen', text: (b) => `Jeres BMI er ${b}. Med den rette plan kan I forbedre, hvordan kroppen føles og bevæger sig. Vi guider jer med små, enkle skridt, der passer ind i hverdagen.` },
+    },
   }),
   gr: localize(EN, {
     plans: [
@@ -385,6 +447,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Όρους χρήσης',
     privacy: 'Πολιτική απορρήτου',
     refund: 'Πολιτική επιστροφής χρημάτων',
+    consentAnd: 'και',
+    consentError: 'Παρακαλούμε αποδεχτείτε τους όρους για να συνεχίσετε.',
     consentBody: (today, renew) => `Πρόκειται για συνδρομή με αυτόματη ανανέωση. Σήμερα θα χρεωθείτε ${today}. Μετά το τέλος της περιόδου, το πλάνο θα ανανεωθεί στα ${renew}, εκτός αν το ακυρώσετε. Μπορείτε να το ακυρώσετε οποιαδήποτε στιγμή, τουλάχιστον 48 ώρες πριν από την ανανέωση, στο:`,
     yourResults: 'Τα αποτελέσματά σας',
     primaryGoal: 'ΒΑΣΙΚΟΣ ΣΤΟΧΟΣ',
@@ -400,6 +464,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'Με το TAICHI COACH μπορείτε να:',
     bullets: ['Χτίσετε μεγαλύτερη αυτοπεποίθηση', 'Έχετε περισσότερη ενέργεια', 'Χαλαρώσετε και να μειώσετε το στρες', 'Υποστηρίξετε το σώμα σας μακροπρόθεσμα'],
     whatYouGet: 'Τι αποκτάτε με το TAICHI COACH',
+    features: [
+      { title: 'Ένα εξατομικευμένο σύστημα κίνησης', desc: 'Το πλάνο σας είναι φτιαγμένο γύρω από το σώμα, την ενέργεια και την καθημερινή σας ζωή — όχι μια γενική ρουτίνα.' },
+      { title: 'Ξεκάθαρη καθημερινή κατεύθυνση', desc: 'Ξέρετε πάντα τι να κάνετε σήμερα, χωρίς να σκέφτεστε ή να σχεδιάζετε.' },
+      { title: 'Προσαρμοστική καθοδήγηση που σας ακολουθεί', desc: 'Το πλάνο σας ρυθμίζεται καθώς προχωράτε — βάσει της προόδου, της ενέργειας και της συνέπειάς σας.' },
+      { title: 'Υποστήριξη όταν τη χρειάζεστε περισσότερο', desc: 'Αν νιώσετε αδιέξοδο, κούραση ή χάσετε μια μέρα — το πλάνο σας βοηθά να επανέλθετε.' },
+    ],
+    socialText: 'Εκατομμύρια άνθρωποι έχουν ήδη δοκιμάσει απλές καθημερινές ρουτίνες κίνησης',
+    socialSub: 'Και πολλοί έχουν δει πραγματική πρόοδο με την πάροδο του χρόνου.',
+    socialCta: 'Ξεκινήστε τώρα',
+    storiesHeading: 'Αληθινές ιστορίες από ανθρώπους που χρησιμοποιούν το TAICHI COACH',
+    personalHeading: (name) => `${name ? `${name}, χτίστε` : 'Χτίστε'} πραγματικά αποτελέσματα με τον δικό σας ρυθμό`,
+    guaranteeTitle: 'Εγγύηση επιστροφής χρημάτων 28 ημερών',
+    guaranteeBody: 'Δοκιμάστε το TAICHI COACH χωρίς κίνδυνο. Αν δεν είναι το κατάλληλο για εσάς, μπορείτε να ζητήσετε επιστροφή χρημάτων εντός 28 ημερών. Ανατρέξτε στην πολιτική επιστροφών για πλήρεις λεπτομέρειες.',
+    footer: '© 2026 TAICHI COACH. Με την επιφύλαξη παντός δικαιώματος.',
+    goalLabels: { 'lose-weight': 'Απώλεια βάρους', 'heart-health': 'Βελτίωση καρδιαγγειακής υγείας', 'firm-toned': 'Περισσότερη σύσφιξη', 'lower-bio-age': 'Να νιώθω νεότερος/α και ενεργητικός/ή' },
+    sleepLabels: { 'less-than-5': 'Κακή', '<5': 'Κακή', '5-6': 'Χρειάζεται βελτίωση', '7-8': 'Καλή', '8-9': 'Καλή', '9+': 'Θα μπορούσε να είναι καλύτερη' },
+    fitnessLabels: { sedentary: 'Χαμηλό', 'lightly-active': 'Χαμηλό', light: 'Χαμηλό', moderate: 'Μέτριο', intermediate: 'Μέτριο', active: 'Υψηλό', 'very-active': 'Υψηλό', advanced: 'Υψηλό' },
+    bmi: {
+      Normal: { title: 'Καλό σημείο εκκίνησης', text: (b) => `Ο ΔΜΣ σας είναι ${b}, που είναι στο φυσιολογικό εύρος. Βρίσκεστε στο σωστό δρόμο. Το πλάνο σας θα προσαρμοστεί στις ανάγκες σας και θα σας βοηθήσει να διατηρήσετε την πρόοδό σας.` },
+      Underweight: { title: 'Καλό σημείο εκκίνησης', text: (b) => `Ο ΔΜΣ σας είναι ${b}, που είναι κάτω από το συνηθισμένο εύρος. Το πλάνο σας θα εστιάσει στην ανάπτυξη δύναμης και ισορροπημένης διατροφής.` },
+      Overweight: { title: 'Καλή στιγμή να κάνετε μια αλλαγή', text: (b) => `Ο ΔΜΣ σας είναι ${b}. Με τη σωστή ρουτίνα, μπορείτε να βελτιώσετε το πώς νιώθει το σώμα σας. Θα σας καθοδηγήσουμε βήμα βήμα με ένα πλάνο που ταιριάζει στην καθημερινή σας ζωή.` },
+      Obese: { title: 'Καλή στιγμή να φροντίσετε το σώμα σας', text: (b) => `Ο ΔΜΣ σας είναι ${b}. Με το κατάλληλο πλάνο, μπορείτε να βελτιώσετε το πώς νιώθει και κινείται το σώμα σας. Θα σας καθοδηγήσουμε με μικρά, απλά βήματα που χωράνε στην καθημερινή σας ζωή.` },
+    },
   }),
   hu: localize(EN, {
     plans: [
@@ -417,6 +504,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Felhasználási feltételeket',
     privacy: 'Adatvédelmi szabályzatot',
     refund: 'Visszatérítési szabályzatot',
+    consentAnd: 'és',
+    consentError: 'A folytatáshoz fogadja el a feltételeket.',
     consentBody: (today, renew) => `Ez egy automatikusan megújuló előfizetés. Ma ${today} kerül levonásra. Az időszak végén a csomag ${renew} áron megújul, ha nem mondják le. Bármikor lemondható, legalább 48 órával a megújulás előtt, ezen az e-mail-címen:`,
     yourResults: 'Az Önök eredményei',
     primaryGoal: 'ELSŐDLEGES CÉL',
@@ -432,6 +521,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'A TAICHI COACH segítségével:',
     bullets: ['Növelhetik az önbizalmukat', 'Több energiát nyerhetnek', 'Ellazulhatnak és csökkenthetik a stresszt', 'Hosszú távon támogathatják a testüket'],
     whatYouGet: 'Mit kapnak a TAICHI COACH-csal',
+    features: [
+      { title: 'Személyre szabott mozgásrendszer', desc: 'A terv az Ön testére, energiájára és mindennapjaira épül — nem egy általános rutinra.' },
+      { title: 'Egyértelmű napi irány', desc: 'Mindig tudja, mit kell ma tennie, gondolkodás és tervezés nélkül.' },
+      { title: 'Adaptív útmutatás, amely követi Önt', desc: 'A terv menet közben igazodik — a haladás, az energia és a következetesség alapján.' },
+      { title: 'Támogatás, amikor a leginkább szüksége van rá', desc: 'Ha elakad, fáradt, vagy kihagyna egy napot — a terv segít visszatérni a helyes útra.' },
+    ],
+    socialText: 'Milliónyian próbáltak már ki egyszerű napi mozgásrutinokat',
+    socialSub: 'És sokan láttak valódi haladást idővel.',
+    socialCta: 'Kezdje el most',
+    storiesHeading: 'Valódi történetek TAICHI COACH-t használóktól',
+    personalHeading: (name) => `${name ? `${name}, érjen el` : 'Érjen el'} valódi eredményeket a saját ütemében`,
+    guaranteeTitle: '28 napos pénzvisszafizetési garancia',
+    guaranteeBody: 'Próbálják ki a TAICHI COACH-t kockázat nélkül. Ha nem nekik való, 28 napon belül kérhetnek visszatérítést. A teljes részletekért tekintse meg a visszatérítési szabályzatunkat.',
+    footer: '© 2026 TAICHI COACH. Minden jog fenntartva.',
+    goalLabels: { 'lose-weight': 'Fogyás', 'heart-health': 'Szívegészség javítása', 'firm-toned': 'Izomtónus növelése', 'lower-bio-age': 'Fiatalabbnak és energikusabbnak érezni magát' },
+    sleepLabels: { 'less-than-5': 'Rossz', '<5': 'Rossz', '5-6': 'Javításra szorul', '7-8': 'Jó', '8-9': 'Jó', '9+': 'Lehetne jobb is' },
+    fitnessLabels: { sedentary: 'Alacsony', 'lightly-active': 'Alacsony', light: 'Alacsony', moderate: 'Közepes', intermediate: 'Közepes', active: 'Magas', 'very-active': 'Magas', advanced: 'Magas' },
+    bmi: {
+      Normal: { title: 'Jó kiindulópont', text: (b) => `BMI-je ${b}, ami a normál tartományban van. Jó irányba halad. A terv az igényeihez igazodik, és segít megőrizni az előrehaladást.` },
+      Underweight: { title: 'Jó kiindulópont', text: (b) => `BMI-je ${b}, ami az átlagosnál alacsonyabb. A terv az erőépítésre és a kiegyensúlyozott táplálkozásra összpontosít.` },
+      Overweight: { title: 'Jó alkalom a változásra', text: (b) => `BMI-je ${b}. A megfelelő rutinnal javíthatja, hogyan érzi magát a teste. Lépésről lépésre kalauzoljuk egy olyan tervvel, amely illik a mindennapjaikhoz.` },
+      Obese: { title: 'Jó idő gondoskodni a testéről', text: (b) => `BMI-je ${b}. A megfelelő tervvel javíthatja, hogyan érzi és mozog a teste. Kis, egyszerű lépésekkel kalauzoljuk, amelyek beleillenek a mindennapokba.` },
+    },
   }),
   hr: localize(EN, {
     plans: [
@@ -449,6 +561,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Uvjete korištenja',
     privacy: 'Pravila privatnosti',
     refund: 'Pravila povrata novca',
+    consentAnd: 'i',
+    consentError: 'Molimo prihvatite uvjete za nastavak.',
     consentBody: (today, renew) => `Ovo je pretplata s automatskim obnavljanjem. Danas će vam se naplatiti ${today}. Nakon završetka razdoblja plan će se obnoviti po cijeni od ${renew}, osim ako ga ne otkažete. Otkazati ga možete bilo kada, najmanje 48 sati prije obnove, na adresi:`,
     yourResults: 'Vaši rezultati',
     primaryGoal: 'GLAVNI CILJ',
@@ -464,6 +578,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'Uz TAICHI COACH možete:',
     bullets: ['Izgraditi više samopouzdanja', 'Imati više energije', 'Opustiti se i smanjiti stres', 'Dugoročno podupirati svoje tijelo'],
     whatYouGet: 'Što dobivate uz TAICHI COACH',
+    features: [
+      { title: 'Personalizirani sustav kretanja', desc: 'Vaš plan je sagrađen oko vašeg tijela, energije i svakodnevnog života — a ne generičke rutine.' },
+      { title: 'Jasna dnevna uputstva', desc: 'Uvijek znate što trebate raditi danas, bez razmišljanja ili planiranja.' },
+      { title: 'Prilagodljivo vodstvo koje vas prati', desc: 'Vaš plan se prilagođava kako napredujete — na temelju vašeg napretka, energije i dosljednosti.' },
+      { title: 'Podrška kada vam je najpotrebnija', desc: 'Ako se osjećate zaglavlje, umorni ili propustite dan — vaš plan vam pomaže da se vratite na pravi put.' },
+    ],
+    socialText: 'Milijuni ljudi već su isprobali jednostavne svakodnevne rutine kretanja',
+    socialSub: 'Mnogi su s vremenom primijetili pravi napredak.',
+    socialCta: 'Počnite odmah',
+    storiesHeading: 'Prave priče od ljudi koji koriste TAICHI COACH',
+    personalHeading: (name) => `${name ? `${name}, postignite` : 'Postignite'} prave rezultate vlastitim tempom`,
+    guaranteeTitle: '28-dnevno jamstvo povrata novca',
+    guaranteeBody: 'Isprobajte TAICHI COACH bez rizika. Ako vam ne odgovara, možete zatražiti povrat novca unutar 28 dana. Pogledajte naša pravila povrata za potpune detalje.',
+    footer: '© 2026 TAICHI COACH. Sva prava pridržana.',
+    goalLabels: { 'lose-weight': 'Smanjiti tjelesnu težinu', 'heart-health': 'Poboljšati zdravlje srca', 'firm-toned': 'Postati toniranije', 'lower-bio-age': 'Osjećati se mlađe i energičnije' },
+    sleepLabels: { 'less-than-5': 'Loša', '<5': 'Loša', '5-6': 'Treba poboljšanje', '7-8': 'Dobra', '8-9': 'Dobra', '9+': 'Može biti bolja' },
+    fitnessLabels: { sedentary: 'Niska', 'lightly-active': 'Niska', light: 'Niska', moderate: 'Srednja', intermediate: 'Srednja', active: 'Visoka', 'very-active': 'Visoka', advanced: 'Visoka' },
+    bmi: {
+      Normal: { title: 'Dobra polazna točka', text: (b) => `Vaš BMI je ${b}, što je u normalnom rasponu. Na pravom ste putu. Plan će se prilagoditi vašim potrebama i pomoći vam zadržati napredak.` },
+      Underweight: { title: 'Dobra polazna točka', text: (b) => `Vaš BMI je ${b}, što je ispod uobičajenog raspona. Plan će se fokusirati na izgradnju snage i uravnoteženu prehranu.` },
+      Overweight: { title: 'Dobar trenutak za promjenu', text: (b) => `Vaš BMI je ${b}. Uz pravu rutinu možete poboljšati kako se osjeća vaše tijelo. Vodit ćemo vas korak po korak s planom koji odgovara vašem svakodnevnom životu.` },
+      Obese: { title: 'Dobro vrijeme za brigu o tijelu', text: (b) => `Vaš BMI je ${b}. Uz pravi plan možete poboljšati kako se vaše tijelo osjeća i kreće. Vodit ćemo vas s malim, jednostavnim koracima koji se uklapaju u svakodnevni život.` },
+    },
   }),
   il: localize(EN, {
     plans: [
@@ -481,6 +618,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'תנאי השימוש',
     privacy: 'מדיניות הפרטיות',
     refund: 'מדיניות ההחזרים',
+    consentAnd: 'ו',
+    consentError: 'כדי להמשיך, אנא קבלו את התנאים.',
     consentBody: (today, renew) => `זהו מנוי עם חידוש אוטומטי. היום תחויבו ב-${today}. לאחר סיום התקופה, המנוי יתחדש במחיר ${renew}, אלא אם תבטלו. ניתן לבטל בכל עת, לפחות 48 שעות לפני החידוש, בכתובת:`,
     yourResults: 'התוצאות שלכם',
     primaryGoal: 'מטרה עיקרית',
@@ -496,6 +635,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'עם TAICHI COACH תוכלו:',
     bullets: ['לחזק את הביטחון העצמי', 'להרגיש יותר אנרגיה', 'להירגע ולהפחית מתח', 'לתמוך בגוף שלכם לאורך זמן'],
     whatYouGet: 'מה מקבלים עם TAICHI COACH',
+    features: [
+      { title: 'מערכת תנועה מותאמת אישית', desc: 'התוכנית שלכם בנויה סביב גופכם, האנרגיה שלכם וחיי היומיום שלכם — לא שגרה גנרית.' },
+      { title: 'כיוון יומי ברור', desc: 'תמיד תדעו מה לעשות היום, בלי לחשוב או לתכנן.' },
+      { title: 'הדרכה מסתגלת שעוקבת אחריכם', desc: 'התוכנית שלכם מתעדכנת תוך כדי — בהתאם להתקדמות, האנרגיה והעקביות שלכם.' },
+      { title: 'תמיכה כשאתם הכי זקוקים לה', desc: 'אם אתם מרגישים תקועים, עייפים או מפספסים יום — התוכנית שלכם עוזרת לכם לחזור למסלול.' },
+    ],
+    socialText: 'מיליוני אנשים כבר ניסו שגרות תנועה יומיות פשוטות',
+    socialSub: 'ורבים מהם ראו התקדמות אמיתית לאורך זמן.',
+    socialCta: 'התחילו עכשיו',
+    storiesHeading: 'סיפורים אמיתיים מאנשים שמשתמשים ב-TAICHI COACH',
+    personalHeading: (name) => `${name ? `${name}, השיגו` : 'השיגו'} תוצאות אמיתיות בקצב שלכם`,
+    guaranteeTitle: 'אחריות להחזר כספי ל-28 יום',
+    guaranteeBody: 'נסו את TAICHI COACH ללא סיכון. אם זה לא מתאים לכם, תוכלו לבקש החזר כספי תוך 28 יום. עיינו במדיניות ההחזרים שלנו לפרטים המלאים.',
+    footer: '© 2026 TAICHI COACH. כל הזכויות שמורות.',
+    goalLabels: { 'lose-weight': 'לרדת במשקל', 'heart-health': 'לשפר את בריאות הלב', 'firm-toned': 'להשיג יותר עיצוב שרירי', 'lower-bio-age': 'להרגיש צעיר יותר ומלא אנרגיה' },
+    sleepLabels: { 'less-than-5': 'גרועה', '<5': 'גרועה', '5-6': 'דורשת שיפור', '7-8': 'טובה', '8-9': 'טובה', '9+': 'יכולה להיות טובה יותר' },
+    fitnessLabels: { sedentary: 'נמוכה', 'lightly-active': 'נמוכה', light: 'נמוכה', moderate: 'בינונית', intermediate: 'בינונית', active: 'גבוהה', 'very-active': 'גבוהה', advanced: 'גבוהה' },
+    bmi: {
+      Normal: { title: 'נקודת התחלה טובה', text: (b) => `ה-BMI שלכם הוא ${b}, שנמצא בטווח הנורמלי. אתם בדרך הנכונה. התוכנית שלכם תותאם לצרכיכם ותעזור לכם לשמור על ההתקדמות.` },
+      Underweight: { title: 'נקודת התחלה טובה', text: (b) => `ה-BMI שלכם הוא ${b}, שנמוך מהטווח הרגיל. התוכנית שלכם תתמקד בבניית כוח ותזונה מאוזנת.` },
+      Overweight: { title: 'זמן טוב לשנות', text: (b) => `ה-BMI שלכם הוא ${b}. עם שגרה מתאימה, תוכלו לשפר את תחושת גופכם. נדריך אתכם צעד אחר צעד עם תוכנית שמתאימה לחיי היומיום שלכם.` },
+      Obese: { title: 'זמן טוב לטפל בגוף שלכם', text: (b) => `ה-BMI שלכם הוא ${b}. עם התוכנית הנכונה, תוכלו לשפר את תחושת גופכם ואת תנועתו. נדריך אתכם בצעדים קטנים ופשוטים שמתאימים לחיי היומיום.` },
+    },
   }),
   jp: localize(EN, {
     plans: [
@@ -513,6 +675,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: '利用規約',
     privacy: 'プライバシーポリシー',
     refund: '返金ポリシー',
+    consentAnd: 'および',
+    consentError: '続行するには利用規約に同意してください。',
     consentBody: (today, renew) => `これは自動更新のサブスクリプションです。本日 ${today} が請求されます。期間終了後は、解約しない限り ${renew} で自動更新されます。更新の48時間前までであれば、いつでも次のメールアドレスから解約できます:`,
     yourResults: 'あなたの結果',
     primaryGoal: '主な目標',
@@ -528,6 +692,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'TAICHI COACHでできること:',
     bullets: ['自信を育てる', 'エネルギーを高める', 'リラックスしてストレスを減らす', '体を長く支える'],
     whatYouGet: 'TAICHI COACHで得られること',
+    features: [
+      { title: '個人に合わせた動きのシステム', desc: 'あなたの体、エネルギー、毎日の生活に合わせて作られたプランです — 一般的なルーティンではありません。' },
+      { title: '明確な毎日の方向性', desc: '考えたり計画したりしなくても、今日何をすればいいかが常にわかります。' },
+      { title: 'あなたに合わせて変わるサポート', desc: 'プランは進捗、エネルギー、継続性に応じて調整されます。' },
+      { title: '最も必要な時のサポート', desc: '行き詰まりを感じたり、疲れていたり、1日休んだりしても — プランが軌道に戻るよう助けてくれます。' },
+    ],
+    socialText: '何百万人もの人々がシンプルな毎日の動きのルーティンを試してきました',
+    socialSub: 'そして多くの人が時間をかけて本当の進歩を見せました。',
+    socialCta: '今すぐ始める',
+    storiesHeading: 'TAICHI COACHを使っている人々の実際のストーリー',
+    personalHeading: (name) => `${name ? `${name}、自分のペースで` : '自分のペースで'}本当の結果を手に入れましょう`,
+    guaranteeTitle: '28日間の返金保証',
+    guaranteeBody: 'TAICHI COACHをリスクなくお試しください。ご自身に合わない場合は、28日以内に返金をお申し込みいただけます。詳細は返金ポリシーをご確認ください。',
+    footer: '© 2026 TAICHI COACH. All rights reserved.',
+    goalLabels: { 'lose-weight': '体重を減らす', 'heart-health': '心臓の健康を改善する', 'firm-toned': 'もっと引き締める', 'lower-bio-age': '若くてエネルギッシュに感じる' },
+    sleepLabels: { 'less-than-5': '不良', '<5': '不良', '5-6': '改善が必要', '7-8': '良好', '8-9': '良好', '9+': 'もう少し改善できる' },
+    fitnessLabels: { sedentary: '低い', 'lightly-active': '低い', light: '低い', moderate: '中程度', intermediate: '中程度', active: '高い', 'very-active': '高い', advanced: '高い' },
+    bmi: {
+      Normal: { title: '良いスタート地点', text: (b) => `あなたのBMIは${b}で、正常範囲内です。正しい方向に向かっています。プランはあなたのニーズに合わせて調整され、進捗を維持するのに役立ちます。` },
+      Underweight: { title: '良いスタート地点', text: (b) => `あなたのBMIは${b}で、通常の範囲より低い値です。プランは筋力づくりとバランスの取れた栄養摂取に焦点を当てます。` },
+      Overweight: { title: '変化を起こす良い機会', text: (b) => `あなたのBMIは${b}です。適切なルーティンで、体の感覚を改善できます。毎日の生活に合ったプランで、一歩一歩ご案内します。` },
+      Obese: { title: '体を大切にする良い機会', text: (b) => `あなたのBMIは${b}です。適切なプランで、体の感覚や動きを改善できます。毎日の生活に合う、小さくシンプルなステップでご案内します。` },
+    },
   }),
   ru: localize(EN, {
     plans: [
@@ -545,6 +732,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Условиями использования',
     privacy: 'Политикой конфиденциальности',
     refund: 'Политикой возврата средств',
+    consentAnd: 'и',
+    consentError: 'Пожалуйста, примите условия, чтобы продолжить.',
     consentBody: (today, renew) => `Это подписка с автоматическим продлением. Сегодня с вас будет списано ${today}. После окончания периода план автоматически продлится за ${renew}, если вы его не отмените. Отменить можно в любой момент, минимум за 48 часов до продления, написав на:`,
     yourResults: 'Ваши результаты',
     primaryGoal: 'ГЛАВНАЯ ЦЕЛЬ',
@@ -560,6 +749,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'С TAICHI COACH вы можете:',
     bullets: ['Укрепить уверенность в себе', 'Получить больше энергии', 'Расслабиться и снизить стресс', 'Поддерживать своё тело в долгосрочной перспективе'],
     whatYouGet: 'Что вы получаете с TAICHI COACH',
+    features: [
+      { title: 'Персонализированная система движения', desc: 'Ваш план создан под ваше тело, вашу энергию и ваши будни — а не по шаблону.' },
+      { title: 'Чёткое ежедневное направление', desc: 'Вы всегда знаете, что делать сегодня, без лишних размышлений и планирования.' },
+      { title: 'Адаптивное сопровождение, которое следует за вами', desc: 'Ваш план корректируется по ходу — в зависимости от прогресса, энергии и регулярности.' },
+      { title: 'Поддержка в нужный момент', desc: 'Если вы чувствуете, что зашли в тупик, устали или пропустили день — план поможет вам вернуться на путь.' },
+    ],
+    socialText: 'Миллионы людей уже попробовали простые ежедневные двигательные рутины',
+    socialSub: 'И многие со временем увидели реальный прогресс.',
+    socialCta: 'Начать сейчас',
+    storiesHeading: 'Реальные истории людей, использующих TAICHI COACH',
+    personalHeading: (name) => `${name ? `${name}, добивайтесь` : 'Добивайтесь'} настоящих результатов в своём темпе`,
+    guaranteeTitle: 'Гарантия возврата денег в течение 28 дней',
+    guaranteeBody: 'Попробуйте TAICHI COACH без риска. Если вам не подойдёт, вы можете запросить возврат средств в течение 28 дней. Подробности — в нашей политике возврата.',
+    footer: '© 2026 TAICHI COACH. Все права защищены.',
+    goalLabels: { 'lose-weight': 'Похудеть', 'heart-health': 'Улучшить здоровье сердца', 'firm-toned': 'Подтянуть тело', 'lower-bio-age': 'Чувствовать себя моложе и энергичнее' },
+    sleepLabels: { 'less-than-5': 'Плохой', '<5': 'Плохой', '5-6': 'Требует улучшения', '7-8': 'Хороший', '8-9': 'Хороший', '9+': 'Мог бы быть лучше' },
+    fitnessLabels: { sedentary: 'Низкий', 'lightly-active': 'Низкий', light: 'Низкий', moderate: 'Средний', intermediate: 'Средний', active: 'Высокий', 'very-active': 'Высокий', advanced: 'Высокий' },
+    bmi: {
+      Normal: { title: 'Хорошая отправная точка', text: (b) => `Ваш ИМТ — ${b}, что соответствует норме. Вы на правильном пути. План будет скорректирован под ваши потребности и поможет сохранить результат.` },
+      Underweight: { title: 'Хорошая отправная точка', text: (b) => `Ваш ИМТ — ${b}, что ниже обычного диапазона. План сосредоточится на развитии силы и сбалансированном питании.` },
+      Overweight: { title: 'Хорошее время для перемен', text: (b) => `Ваш ИМТ — ${b}. При правильном режиме вы сможете улучшить самочувствие. Мы поведём вас шаг за шагом с планом, который подойдёт под ваш распорядок.` },
+      Obese: { title: 'Хорошее время позаботиться о теле', text: (b) => `Ваш ИМТ — ${b}. С правильным планом вы сможете улучшить самочувствие и подвижность. Мы поведём вас небольшими, простыми шагами, которые впишутся в вашу жизнь.` },
+    },
   }),
   sk: localize(EN, {
     plans: [
@@ -577,6 +789,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: 'Podmienkami používania',
     privacy: 'Zásadami ochrany súkromia',
     refund: 'Zásadami vrátenia peňazí',
+    consentAnd: 'a',
+    consentError: 'Ak chcete pokračovať, prijmite prosím podmienky.',
     consentBody: (today, renew) => `Ide o predplatné s automatickým obnovením. Dnes vám bude účtované ${today}. Po skončení obdobia sa plán obnoví za ${renew}, ak ho nezrušíte. Zrušiť ho môžete kedykoľvek, najneskôr 48 hodín pred obnovením, na e-maile:`,
     yourResults: 'Vaše výsledky',
     primaryGoal: 'HLAVNÝ CIEĽ',
@@ -592,6 +806,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'S TAICHI COACH môžete:',
     bullets: ['Budovať väčšie sebavedomie', 'Získať viac energie', 'Uvoľniť sa a znížiť stres', 'Dlhodobo podporovať svoje telo'],
     whatYouGet: 'Čo získate s TAICHI COACH',
+    features: [
+      { title: 'Personalizovaný pohybový systém', desc: 'Váš plán je postavený na základe vášho tela, energie a bežného dňa — nie podľa všeobecnej rutiny.' },
+      { title: 'Jasný denný smer', desc: 'Vždy viete, čo máte dnes robiť, bez zbytočného premýšľania a plánovania.' },
+      { title: 'Vedenie, ktoré sa prispôsobuje', desc: 'Plán sa upravuje podľa vášho pokroku, energie a pravidelnosti.' },
+      { title: 'Podpora vo chvíli, keď je najviac potrebná', desc: 'Keď sa zaseknete, ste unavení alebo vynecháte deň, plán vám pomôže vrátiť sa späť.' },
+    ],
+    socialText: 'Milióny ľudí už vyskúšali jednoduché každodenné pohybové rutiny',
+    socialSub: 'A mnohí z nich časom videli skutočný pokrok.',
+    socialCta: 'Začať hneď',
+    storiesHeading: 'Skutočné príbehy ľudí, ktorí používajú TAICHI COACH',
+    personalHeading: (name) => `${name ? `${name}, dosiahnite` : 'Dosiahnite'} skutočné výsledky vlastným tempom`,
+    guaranteeTitle: '28-dňová garancia vrátenia peňazí',
+    guaranteeBody: 'Vyskúšajte TAICHI COACH bez rizika. Ak vám nebude vyhovovať, môžete do 28 dní požiadať o vrátenie peňazí. Podrobnosti nájdete v našich zásadách vrátenia peňazí.',
+    footer: '© 2026 TAICHI COACH. Všetky práva vyhradené.',
+    goalLabels: { 'lose-weight': 'Schudnúť', 'heart-health': 'Zlepšiť zdravie srdca', 'firm-toned': 'Viac spevniť postavu', 'lower-bio-age': 'Cítiť sa mladší a plný energie' },
+    sleepLabels: { 'less-than-5': 'Zlá', '<5': 'Zlá', '5-6': 'Je potrebné zlepšiť', '7-8': 'Dobrá', '8-9': 'Dobrá', '9+': 'Mohla by byť lepšia' },
+    fitnessLabels: { sedentary: 'Nízka', 'lightly-active': 'Nízka', light: 'Nízka', moderate: 'Stredná', intermediate: 'Stredná', active: 'Vysoká', 'very-active': 'Vysoká', advanced: 'Vysoká' },
+    bmi: {
+      Normal: { title: 'Dobrý štartovací bod', text: (b) => `Vaše BMI je ${b}, čo je v normálnom rozmedzí. Ste na správnej ceste. Plán sa prispôsobí vašim potrebám a pomôže vám udržať pokrok.` },
+      Underweight: { title: 'Dobrý štartovací bod', text: (b) => `Vaše BMI je ${b}, čo je pod bežným rozmedzím. Plán sa zameria na budovanie sily a vyváženú výživu.` },
+      Overweight: { title: 'Dobrý čas na zmenu', text: (b) => `Vaše BMI je ${b}. So správnou rutinou môžete zlepšiť, ako sa vaše telo cíti. Budeme vás viesť krok za krokom s plánom, ktorý zapadá do vášho každodenného života.` },
+      Obese: { title: 'Dobrý čas starať sa o telo', text: (b) => `Vaše BMI je ${b}. So správnym plánom môžete zlepšiť, ako sa vaše telo cíti a hýbe. Budeme vás viesť malými, jednoduchými krokmi, ktoré sa zmestia do každodenného života.` },
+    },
   }),
   tw: localize(EN, {
     plans: [
@@ -609,6 +846,8 @@ const COPY: Record<LangCode, Copy> = {
     terms: '使用條款',
     privacy: '隱私權政策',
     refund: '退款政策',
+    consentAnd: '及',
+    consentError: '請接受條款以繼續。',
     consentBody: (today, renew) => `這是一項自動續訂的訂閱服務。今天將收取 ${today}。方案期滿後，若您未取消，將以 ${renew} 自動續訂。您可於續訂前至少 48 小時隨時透過以下信箱取消:`,
     yourResults: '您的結果',
     primaryGoal: '主要目標',
@@ -624,6 +863,29 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: '使用 TAICHI COACH，您可以:',
     bullets: ['建立更多自信', '提升活力', '放鬆並減少壓力', '長期照顧您的身體'],
     whatYouGet: '使用 TAICHI COACH 可獲得的內容',
+    features: [
+      { title: '個人化動作系統', desc: '您的計畫是根據您的身體、精力和日常生活量身打造，而非一套通用的訓練。' },
+      { title: '每日清晰方向', desc: '您隨時都知道今天要做什麼，不需要思考或另外規劃。' },
+      { title: '隨時跟隨您調整的指導', desc: '計畫會根據您的進度、精力和規律性持續調整。' },
+      { title: '在最需要時提供支持', desc: '如果您感到卡關、疲憊，或某天沒有完成 — 計畫會幫助您重新回到正軌。' },
+    ],
+    socialText: '數百萬人已經嘗試了簡單的每日動作習慣',
+    socialSub: '許多人在一段時間後都看到了真實的進步。',
+    socialCta: '立即開始',
+    storiesHeading: '使用 TAICHI COACH 的真實故事',
+    personalHeading: (name) => `${name ? `${name}，以您自己的步調` : '以您自己的步調'}建立真實成果`,
+    guaranteeTitle: '28 天退款保證',
+    guaranteeBody: '放心體驗 TAICHI COACH，毫無風險。如果不適合您，您可在 28 天內申請退款。完整細節請參閱我們的退款政策。',
+    footer: '© 2026 TAICHI COACH. 版權所有。',
+    goalLabels: { 'lose-weight': '減輕體重', 'heart-health': '改善心臟健康', 'firm-toned': '增加肌肉線條', 'lower-bio-age': '感覺更年輕、更有活力' },
+    sleepLabels: { 'less-than-5': '差', '<5': '差', '5-6': '需要改善', '7-8': '良好', '8-9': '良好', '9+': '可以更好' },
+    fitnessLabels: { sedentary: '低', 'lightly-active': '低', light: '低', moderate: '中', intermediate: '中', active: '高', 'very-active': '高', advanced: '高' },
+    bmi: {
+      Normal: { title: '良好的起點', text: (b) => `您的 BMI 為 ${b}，屬於正常範圍。您走在正確的方向上。您的計畫將根據您的需求進行調整，並幫助您保持進步。` },
+      Underweight: { title: '良好的起點', text: (b) => `您的 BMI 為 ${b}，低於一般範圍。您的計畫將著重於增強體力和均衡飲食。` },
+      Overweight: { title: '做出改變的好時機', text: (b) => `您的 BMI 為 ${b}。透過適當的訓練，您可以改善身體的感覺。我們將以適合您日常生活的計畫，一步一步引導您。` },
+      Obese: { title: '照顧身體的好時機', text: (b) => `您的 BMI 為 ${b}。透過適當的計畫，您可以改善身體的感覺和活動能力。我們將以小而簡單的步驟引導您，融入您的日常生活中。` },
+    },
   }),
 }
 
@@ -708,13 +970,13 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
         <span className={styles.consentText}>
           {copy.consentPrefix}{' '}
           <a href="https://www.taichiwalkingcoach.com/en-tcwalk-terms-of-services" onClick={(e) => e.stopPropagation()}>{copy.terms}</a>,{' '}
-          <a href="https://www.taichiwalkingcoach.com/en-tcwalk-privacy-policy" onClick={(e) => e.stopPropagation()}>{copy.privacy}</a>, and{' '}
+          <a href="https://www.taichiwalkingcoach.com/en-tcwalk-privacy-policy" onClick={(e) => e.stopPropagation()}>{copy.privacy}</a>, {copy.consentAnd}{' '}
           <a href="https://www.taichiwalkingcoach.com/en-tcwalk-money-back-guarantee" onClick={(e) => e.stopPropagation()}>{copy.refund}</a>.{' '}
           {copy.consentBody(selectedPlan.total, selectedPlan.origTotal)}{' '}
           <a href="mailto:hello@taichiwalkingcoach.app" onClick={(e) => e.stopPropagation()}>hello@taichiwalkingcoach.app</a>
         </span>
       </div>
-      {showError && <p className={styles.consentErrorMsg}>Please accept the terms to continue.</p>}
+      {showError && <p className={styles.consentErrorMsg}>{copy.consentError}</p>}
     </div>
   )
 }
@@ -737,7 +999,8 @@ export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: s
     return (urlLang && VALID_LANGS.has(urlLang) ? urlLang : storeLang) as LangCode
   })()
 
-  const copy = localizeBrandValue(COPY[lang] ?? EN, lang)
+  const overrides = useTranslationOverrides(lang)
+  const copy = applyPaywallOverrides(localizeBrandValue(COPY[lang] ?? EN, lang), overrides)
   const [selected, setSelected] = useState<string>('12w')
   const [consent, setConsent] = useState(false)
 
