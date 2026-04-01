@@ -622,8 +622,8 @@ const COPY: Record<LangCode, Copy> = {
   }),
 }
 
-function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPlan, lang }: { copy: Copy; selected: string; onSelect: (id: string) => void; consent: boolean; onConsent: () => void; selectedPlan: (typeof PLANS)[number]; lang: LangCode }) {
-  const checkoutUrl = `https://www.taichiwalkingcoach.com/${lang}-tcwalk-checkout-${selected}`
+function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPlan, lang, checkoutSlug = 'checkout' }: { copy: Copy; selected: string; onSelect: (id: string) => void; consent: boolean; onConsent: () => void; selectedPlan: (typeof PLANS)[number]; lang: LangCode; checkoutSlug?: string }) {
+  const checkoutUrl = `https://www.taichiwalkingcoach.com/${lang}-tcwalk-${checkoutSlug}-${selected}`
   const [showError, setShowError] = useState(false)
 
   const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -714,7 +714,7 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
   )
 }
 
-export default function PaywallPage() {
+export default function PaywallPage({ checkoutSlug = 'checkout' }: { checkoutSlug?: string }) {
   const { answers, _hydrated } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
   const copy = localizeBrandValue(COPY[lang] ?? EN, lang)
@@ -769,6 +769,7 @@ export default function PaywallPage() {
             onConsent={() => setConsent((v) => !v)}
             selectedPlan={selectedPlan}
             lang={lang}
+            checkoutSlug={checkoutSlug}
           />
 
           <div className={styles.block}>
@@ -903,6 +904,7 @@ export default function PaywallPage() {
             onConsent={() => setConsent((v) => !v)}
             selectedPlan={selectedPlan}
             lang={lang}
+            checkoutSlug={checkoutSlug}
           />
 
           <div className={styles.guaranteeBlock}>
