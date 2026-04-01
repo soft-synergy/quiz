@@ -56,14 +56,14 @@ const SECTION_PREFIXES: Record<Section, string> = {
 
 const ALL_SECTIONS: Section[] = [
   'Intro',
-  'UI',
-  'Step Page',
-  'Result',
-  '28-Day',
-  'Wellness',
-  'Loading',
-  'Email',
   'Quiz Steps',
+  'Step Page',
+  'Loading',
+  'Result',
+  'Wellness',
+  '28-Day',
+  'Email',
+  'UI',
 ]
 
 function filterBySection(data: Record<string, string>, section: Section): Record<string, string> {
@@ -766,7 +766,7 @@ export default function TranslationEditorPage() {
               )}
             </div>
             <Link
-              href={lang === 'en' ? '/quiz/1' : `/${lang}/quiz/1`}
+              href={`/${lang}`}
               target="_blank"
               style={{
                 background: 'rgba(255,255,255,0.1)',
@@ -778,10 +778,10 @@ export default function TranslationEditorPage() {
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 5,
               }}
             >
-              🔗 Open Quiz
+              Preview ↗
             </Link>
             <button
               onClick={() => setShowHistory(!showHistory)}

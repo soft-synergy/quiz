@@ -622,7 +622,8 @@ const COPY: Record<LangCode, Copy> = {
   }),
 }
 
-function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPlan }: { copy: Copy; selected: string; onSelect: (id: string) => void; consent: boolean; onConsent: () => void; selectedPlan: (typeof PLANS)[number] }) {
+function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPlan, lang }: { copy: Copy; selected: string; onSelect: (id: string) => void; consent: boolean; onConsent: () => void; selectedPlan: (typeof PLANS)[number]; lang: LangCode }) {
+  const checkoutUrl = `https://www.taichiwalkingcoach.com/${lang}-tcwalk-checkout-${selected}`
   return (
     <div className={styles.pricingBlock}>
       {PLANS.map((plan, idx) => {
@@ -667,7 +668,12 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
         <span><strong>{copy.moneyBackRow}</strong></span>
       </div>
 
-      <button className={styles.ctaBtn} type="button">{copy.cta}</button>
+      <a
+        className={styles.ctaBtn}
+        href={checkoutUrl}
+        onClick={(e) => { if (!consent) e.preventDefault() }}
+        aria-disabled={!consent}
+      >{copy.cta}</a>
 
       <div
         className={styles.consentRow}
@@ -751,6 +757,7 @@ export default function PaywallPage() {
             consent={consent}
             onConsent={() => setConsent((v) => !v)}
             selectedPlan={selectedPlan}
+            lang={lang}
           />
 
           <div className={styles.block}>
@@ -884,6 +891,7 @@ export default function PaywallPage() {
             consent={consent}
             onConsent={() => setConsent((v) => !v)}
             selectedPlan={selectedPlan}
+            lang={lang}
           />
 
           <div className={styles.guaranteeBlock}>
