@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import styles from './OptionCard.module.css'
 import { QuizOption } from '@/lib/quiz-data'
 
@@ -66,14 +67,12 @@ export default function OptionCard({
           aria-hidden="true"
         >
           <div className={styles.skeleton} />
-          <img
-            ref={imgRef}
+          <Image
             src={option.image}
             alt=""
             width={110}
             height={90}
             loading="lazy"
-            decoding="async"
             onLoad={() => setImgLoaded(true)}
             onError={() => setImgLoaded(true)}
           />

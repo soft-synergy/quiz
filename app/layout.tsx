@@ -26,6 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             if (_s.state && _s.state.lang) window.__TAICHI_LANG__ = _s.state.lang;
           } catch(e) {}
         `}} />
+        {/* Preload above-the-fold images */}
+        <link rel="preload" as="image" href="/images/person-intro.png" />
+        <link rel="preload" as="image" href="/images/Quiz - 2026-03-18T165703.172.png" />
       </head>
       <body>
         <StoreHydration />

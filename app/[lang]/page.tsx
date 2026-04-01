@@ -6,6 +6,7 @@ import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
 import { useIntroT, LANGUAGES } from '@/lib/i18n'
 import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
+import Image from 'next/image'
 import LangPicker from '@/components/LangPicker/LangPicker'
 
 const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
@@ -26,13 +27,7 @@ export default function IntroLangPage() {
   const [consentChecked, setConsentChecked] = useState(false)
   const [consentError, setConsentError] = useState(false)
   const [personImgLoaded, setPersonImgLoaded] = useState(false)
-  const imgRef = useRef<HTMLImageElement>(null)
   const errorRef = useRef<HTMLDivElement>(null)
-
-  // Handle cached images — onLoad won't fire if browser already has it
-  useEffect(() => {
-    if (imgRef.current?.complete) setPersonImgLoaded(true)
-  }, [])
 
   // sync URL lang → store
   useEffect(() => {
@@ -79,12 +74,12 @@ export default function IntroLangPage() {
       <div className={styles.content} style={{ display: 'flex', alignItems: 'center' }}>
         <div className={styles.personCol}>
           {!personImgLoaded && <div className={styles.personSkeleton} />}
-          <img
-            ref={imgRef}
+          <Image
             src="/images/person-intro.png"
             alt={t.img_alt}
             width={400}
             height={620}
+            priority
             className={personImgLoaded ? styles.personImgLoaded : styles.personImgHidden}
             onLoad={() => setPersonImgLoaded(true)}
             onError={() => setPersonImgLoaded(true)}
