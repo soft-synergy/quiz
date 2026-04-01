@@ -7,11 +7,11 @@ import WeightChart from '@/components/WeightChart/WeightChart'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore } from '@/lib/lang-store'
 import { useResultT } from '@/lib/i18n'
-import { getGoalDate } from '@/lib/bmi-utils'
+import { getGoalDate, fromCanonical } from '@/lib/bmi-utils'
 
 export default function ResultPage() {
   const router = useRouter()
-  const { answers, _hydrated } = useQuizStore()
+  const { answers, weightUnit, _hydrated } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
   const t = useResultT(lang)
 
@@ -20,6 +20,14 @@ export default function ResultPage() {
   const startWeight = Number(answers[24]) || 222
   const goalWeight = Number(answers[25]) || 120
   const goalDate = getGoalDate(startWeight, goalWeight)
+
+  // Convert canonical lbs values to the user's chosen unit for display
+  const displayStart = weightUnit === 'kg'
+    ? Math.round(Number(fromCanonical(String(startWeight), 'kg', 'lbs')))
+    : startWeight
+  const displayGoal = weightUnit === 'kg'
+    ? Math.round(Number(fromCanonical(String(goalWeight), 'kg', 'lbs')))
+    : goalWeight
 
   return (
     <>
@@ -31,12 +39,12 @@ export default function ResultPage() {
 
           <div className={styles.goalDisplay}>
             <div className={styles.goalWeightLine}>
-              {goalWeight} lbs by {goalDate}
+              {displayGoal} {weightUnit} by {goalDate}
             </div>
             <div className={styles.goalTagline}>{t.guide_text}</div>
           </div>
 
-          <WeightChart startWeight={startWeight} goalWeight={goalWeight} goalDate={goalDate} />
+          <WeightChart startWeight={startWeight} goalWeight={goalWeight} goalDate={goalDate} unit={weightUnit} />
         </div>
       </main>
       <QuizFooter label={t.cta} onClick={() => router.push('/quiz/plan-loading')} />

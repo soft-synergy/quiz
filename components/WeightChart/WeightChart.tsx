@@ -1,17 +1,24 @@
 import styles from './WeightChart.module.css'
+import { fromCanonical } from '@/lib/bmi-utils'
 
 interface Props {
   startWeight: number
   goalWeight: number
   goalDate: string
+  unit?: string
 }
 
-export default function WeightChart({ startWeight, goalWeight }: Props) {
+export default function WeightChart({ startWeight, goalWeight, unit = 'lbs' }: Props) {
   const diff = startWeight - goalWeight
   const m1 = startWeight
   const m2 = Math.round(startWeight - diff * 0.35)
   const m3 = Math.round(startWeight - diff * 0.68)
   const m4 = goalWeight
+
+  const fmt = (lbs: number) =>
+    unit === 'kg'
+      ? Math.round(Number(fromCanonical(String(lbs), 'kg', 'lbs')))
+      : lbs
 
   return (
     <div className={styles.chartCard}>
@@ -88,7 +95,7 @@ export default function WeightChart({ startWeight, goalWeight }: Props) {
               fontSize="11"
               fontWeight="600"
             >
-              {m1} lbs
+              {fmt(m1)} {unit}
             </text>
           </g>
           <g className={styles.lbl2}>
@@ -102,7 +109,7 @@ export default function WeightChart({ startWeight, goalWeight }: Props) {
               fontSize="11"
               fontWeight="600"
             >
-              {m2} lbs
+              {fmt(m2)} {unit}
             </text>
           </g>
           <g className={styles.lbl3}>
@@ -116,7 +123,7 @@ export default function WeightChart({ startWeight, goalWeight }: Props) {
               fontSize="11"
               fontWeight="600"
             >
-              {m3} lbs
+              {fmt(m3)} {unit}
             </text>
           </g>
           <g className={styles.lbl4}>
@@ -130,7 +137,7 @@ export default function WeightChart({ startWeight, goalWeight }: Props) {
               fontSize="11"
               fontWeight="600"
             >
-              {m4} lbs
+              {fmt(m4)} {unit}
             </text>
           </g>
         </svg>

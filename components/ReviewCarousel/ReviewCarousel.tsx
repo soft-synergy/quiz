@@ -15,11 +15,8 @@ const REVIEW_PHOTOS = [
 
 const REVIEWS: Record<LangCode, Review[]> = {
   en: [
-    { photo: REVIEW_PHOTOS[0], name: 'Debora Lampron', text: 'Ok, so whoever made this a thing I thank you so much! This is making me fit and I think if I do it for the whole month or maybe even just this week I will definitely lose some pounds and burn some belly fat.', stars: 5 },
-    { photo: REVIEW_PHOTOS[1], name: 'Samantha Jenkins', text: "I've never really been a fitness person, it always felt like too much. I downloaded this for the routines and, as strange as it sounds, my back pain finally eased up for the first time in a long while.", stars: 4 },
-    { photo: REVIEW_PHOTOS[2], name: 'James Forrest', text: 'My doctor recommended low-impact exercise and this plan is perfect. The Tai Chi parts are calming and the indoor walking keeps my heart rate up just enough.', stars: 5 },
-    { photo: REVIEW_PHOTOS[3], name: 'Maria Santos', text: "I've been using this for 3 weeks and I'm already down 4 pounds. The variety keeps it interesting and I love that I can do it all from my living room, no matter the weather.", stars: 5 },
-    { photo: REVIEW_PHOTOS[4], name: 'Linda Kowalski', text: 'At 67, I thought I was too old to start a new routine. This plan proved me wrong. I feel stronger and more flexible than I have in years.', stars: 5 },
+    { photo: REVIEW_PHOTOS[0], name: 'Anna Miller', text: 'I wanted something simple I could do at home. TAICHI COACH helped me stay consistent. After a few weeks, I felt less stiff, more active, and better in my body.', stars: 5 },
+    { photo: REVIEW_PHOTOS[1], name: 'Laura Bennett', text: 'I had stopped trusting myself to stick with exercise. TAICHI COACH felt simple and easy to follow at home. Now I move more, feel lighter, and have more energy.', stars: 5 },
   ],
   lt: [
     { photo: REVIEW_PHOTOS[0], name: 'Rasa Petrauskienė', text: 'Nuoširdžiai dėkoju tam, kas sukūrė šią programą. Ji padeda man grįžti į formą, o jei tęsiu visą mėnesį, tikrai numesiu svorio ir sumažinsiu pilvo apimtį.', stars: 5 },

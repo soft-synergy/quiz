@@ -28,7 +28,7 @@ function StepContent({
   navigate: (dir: 'forward' | 'backward') => void
   ov: Record<string, string>
 }) {
-  const { answers, setAnswer } = useQuizStore()
+  const { answers, setAnswer, setWeightUnit } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
   const rawT = useStepPageT(lang)
   const t = useMemo(() => applyStepPageOverrides(rawT, ov), [rawT, ov])
@@ -39,8 +39,8 @@ function StepContent({
   const canonicalUnit = stepData?.units?.[0] ?? stepData?.unit ?? ''
 
   const [inputUnit, setInputUnit] = useState<string>(() => {
-    // Default height to ft/in display (more intuitive for most users)
-    if (stepData?.units?.includes('in') && canonicalUnit === 'cm') return 'in'
+    // Default weight to kg, height to cm
+    if (stepData?.units?.includes('kg') && canonicalUnit === 'lbs') return 'kg'
     return canonicalUnit
   })
   const [inputValue, setInputValue] = useState<string>(() => {
@@ -184,8 +184,10 @@ function StepContent({
   }
 
   const handleContinue = () => {
-    if (isInput) setAnswer(stepNum, toCanonical(activeInputValue, inputUnit, canonicalUnit))
-    else if (isTextInput) setAnswer(stepNum, textValue.trim())
+    if (isInput) {
+      setAnswer(stepNum, toCanonical(activeInputValue, inputUnit, canonicalUnit))
+      if (stepNum === WEIGHT_STEP) setWeightUnit(inputUnit)
+    } else if (isTextInput) setAnswer(stepNum, textValue.trim())
     else if (isDateInput && dateValue) setAnswer(stepNum, dateValue)
     navigate('forward')
   }
