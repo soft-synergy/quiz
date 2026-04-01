@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import styles from './page.module.css'
 import QuizHeader from '@/components/QuizHeader/QuizHeader'
 import BMIScale from '@/components/BMIScale/BMIScale'
@@ -7,6 +8,9 @@ import { useQuizStore } from '@/lib/quiz-store'
 import { calcBMI, getBMICategory } from '@/lib/bmi-utils'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
 import { localizeBrandValue } from '@/lib/brand'
+import { LANGUAGES } from '@/lib/i18n'
+
+const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
 
 const PLANS = [
   { id: '28d', discount: '83%', total: '€8.80', origTotal: '€51.67', perDay: '€0.31' },
@@ -716,7 +720,22 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
 
 export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: string }) {
   const { answers, _hydrated } = useQuizStore()
-  const lang = useLangStore((s) => s.lang)
+  const { lang: storeLang, setLang } = useLangStore()
+  const params = useParams()
+
+  // Sync lang from URL param (e.g. /lt/quiz/paywall) → store
+  useEffect(() => {
+    const urlLang = params?.lang as string | undefined
+    if (urlLang && VALID_LANGS.has(urlLang) && urlLang !== storeLang) {
+      setLang(urlLang as LangCode)
+    }
+  }, [params?.lang, storeLang, setLang])
+
+  const lang = (() => {
+    const urlLang = params?.lang as string | undefined
+    return (urlLang && VALID_LANGS.has(urlLang) ? urlLang : storeLang) as LangCode
+  })()
+
   const copy = localizeBrandValue(COPY[lang] ?? EN, lang)
   const [selected, setSelected] = useState<string>('12w')
   const [consent, setConsent] = useState(false)
