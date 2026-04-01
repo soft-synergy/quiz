@@ -9,6 +9,7 @@ import { calcBMI, getBMICategory } from '@/lib/bmi-utils'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
 import { localizeBrandValue } from '@/lib/brand'
 import { LANGUAGES } from '@/lib/i18n'
+import { REVIEWS } from '@/components/ReviewCarousel/ReviewCarousel'
 
 const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
 
@@ -891,7 +892,7 @@ export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: s
           <div className={styles.block}>
             <h2 className={styles.heading}>{copy.storiesHeading}</h2>
 
-            {copy.stories.map((r, i) => (
+            {(REVIEWS[lang] ?? REVIEWS.en).filter((r) => r.stars === 5).slice(0, 3).map((r, i) => (
               <div key={r.name} className={styles.reviewCard}>
                 <div className={styles.reviewTop}>
                   <div className={styles.reviewer}>

@@ -2,6 +2,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import styles from './ReviewCarousel.module.css'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
+import { useParams } from 'next/navigation'
+import { LANGUAGES } from '@/lib/i18n'
+
+const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
 
 type Review = { photo: string; name: string; text: string; stars: number }
 
@@ -13,10 +17,11 @@ const REVIEW_PHOTOS = [
   'https://i.pravatar.cc/96?img=56',
 ]
 
-const REVIEWS: Record<LangCode, Review[]> = {
+export const REVIEWS: Record<LangCode, Review[]> = {
   en: [
     { photo: REVIEW_PHOTOS[0], name: 'Anna Miller', text: 'I wanted something simple I could do at home. TAICHI COACH helped me stay consistent. After a few weeks, I felt less stiff, more active, and better in my body.', stars: 5 },
     { photo: REVIEW_PHOTOS[1], name: 'Laura Bennett', text: 'I had stopped trusting myself to stick with exercise. TAICHI COACH felt simple and easy to follow at home. Now I move more, feel lighter, and have more energy.', stars: 5 },
+    { photo: REVIEW_PHOTOS[2], name: 'Carla M., 48', text: 'I always struggled with my stomach area. The routine was simple, so I stayed consistent. After a few weeks, I started to see changes and feel more comfortable in my body.', stars: 5 },
   ],
   lt: [
     { photo: REVIEW_PHOTOS[0], name: 'Rasa Petrauskienė', text: 'Nuoširdžiai dėkoju tam, kas sukūrė šią programą. Ji padeda man grįžti į formą, o jei tęsiu visą mėnesį, tikrai numesiu svorio ir sumažinsiu pilvo apimtį.', stars: 5 },
@@ -132,7 +137,22 @@ function Avatar({ src, alt }: { src: string; alt: string }) {
 }
 
 export default function ReviewCarousel() {
-  const lang = useLangStore((s) => s.lang)
+  const { lang: storeLang, setLang } = useLangStore()
+  const params = useParams()
+
+  // Sync URL lang param → store (e.g. when linked directly to /lt/quiz/loading-screen)
+  useEffect(() => {
+    const urlLang = params?.lang as string | undefined
+    if (urlLang && VALID_LANGS.has(urlLang) && urlLang !== storeLang) {
+      setLang(urlLang as LangCode)
+    }
+  }, [params?.lang, storeLang, setLang])
+
+  const lang = (() => {
+    const urlLang = params?.lang as string | undefined
+    return (urlLang && VALID_LANGS.has(urlLang) ? urlLang : storeLang) as LangCode
+  })()
+
   const reviews = REVIEWS[lang] ?? REVIEWS.en
   const reviewsLabel = lang === 'jp' ? 'お客様のレビュー' : lang === 'ru' ? 'Отзывы пользователей' : lang === 'tw' ? '用戶評價' : lang === 'il' ? 'ביקורות משתמשים' : lang === 'lt' ? 'Klientų atsiliepimai' : 'Customer reviews'
   const trustpilotLabel = lang === 'jp' ? 'Trustpilot' : lang === 'ru' ? 'Trustpilot' : lang === 'tw' ? 'Trustpilot' : lang === 'il' ? 'Trustpilot' : lang === 'lt' ? 'Trustpilot' : 'Trustpilot'
