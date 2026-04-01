@@ -40,7 +40,7 @@ export default function ResultPage() {
 
           <div className={styles.goalDisplay}>
             <div className={styles.goalWeightLine}>
-              {t.goal_line(displayGoal, goalDate)}
+              {t.goal_line(displayGoal, goalDate, weightUnit)}
             </div>
             <div className={styles.goalTagline}>{t.guide_text}</div>
           </div>

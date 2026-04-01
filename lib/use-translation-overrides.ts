@@ -108,7 +108,7 @@ export function applyResultOverrides(
     guide_text: o('guide_text') ?? t.guide_text,
     cta: o('cta') ?? t.cta,
     goal_line: o('goal_line')
-      ? (w: number, d: string) => o('goal_line')!.replace('__W__', String(w)).replace('__D__', d)
+      ? (w: number, d: string, u?: string) => o('goal_line')!.replace('__W__', String(w)).replace('__D__', d).replace('__U__', u ?? 'kg')
       : t.goal_line,
   }
 }

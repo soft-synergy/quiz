@@ -75,7 +75,7 @@ export interface ResultTranslations {
   headline: string
   subtitle: string
   guide_text: string
-  goal_line: (weight: number, date: string) => string
+  goal_line: (weight: number, date: string, unit?: string) => string
   cta: string
 }
 
@@ -184,20 +184,20 @@ const stepPage: Record<LangCode, StepPageTranslations> = {
 }
 
 const result: Record<LangCode, ResultTranslations> = {
-  en: { header_label:'Your Plan', headline:'Your personal plan is ready', subtitle:'You are moving in the right direction.', guide_text:'We will guide you step by step so you can stay consistent and see progress.', goal_line:(w,d)=>`${w} lbs by ${d}`, cta:'Get My Plan' },
-  lt: { header_label:'Jūsų planas', headline:'Jūsų asmeninis planas paruoštas', subtitle:'Judate teisinga kryptimi.', guide_text:'Vesime jus žingsnis po žingsnio, kad galėtumėte išlikti nuoseklūs ir matyti pažangą.', goal_line:(w,d)=>`${w} svar. iki ${d}`, cta:'Gauti mano planą' },
-  lv: { header_label:'Jūsu plāns', headline:'Jūsu personīgais plāns ir gatavs', subtitle:'Jūs virzāties pareizajā virzienā.', guide_text:'Mēs vadīsim jūs soli pa solim, lai jūs varētu saglabāt regularitāti un redzēt progresu.', goal_line:(w,d)=>`${w} lb līdz ${d}`, cta:'Saņemt manu plānu' },
-  ro: { header_label:'Planul dumneavoastră', headline:'Planul personal este gata', subtitle:'Mergeți în direcția potrivită.', guide_text:'Vă vom ghida pas cu pas, ca să rămâneți consecvenți și să vedeți progresul.', goal_line:(w,d)=>`${w} lbs până la ${d}`, cta:'Vreau planul meu' },
-  cz: { header_label:'Váš plán', headline:'Váš osobní plán je připraven', subtitle:'Jdete správným směrem.', guide_text:'Povedeme vás krok za krokem, abyste vydrželi a viděli pokrok.', goal_line:(w,d)=>`${w} lb do ${d}`, cta:'Získat můj plán' },
-  dk: { header_label:'Jeres plan', headline:'Jeres personlige plan er klar', subtitle:'I bevæger jer i den rigtige retning.', guide_text:'Vi guider jer trin for trin, så I kan holde fast og se fremgang.', goal_line:(w,d)=>`${w} lbs inden ${d}`, cta:'Få min plan' },
-  gr: { header_label:'Το πλάνο σας', headline:'Το προσωπικό σας πλάνο είναι έτοιμο', subtitle:'Κινείστε προς τη σωστή κατεύθυνση.', guide_text:'Θα σας καθοδηγήσουμε βήμα βήμα, ώστε να παραμείνετε σταθεροί και να βλέπετε πρόοδο.', goal_line:(w,d)=>`${w} λίβρες έως ${d}`, cta:'Αποκτήστε το πλάνο μου' },
-  hu: { header_label:'Az Ön terve', headline:'Elkészült a személyre szabott terve', subtitle:'Jó irányba halad.', guide_text:'Lépésről lépésre segítünk, hogy kitartson és lássa a fejlődést.', goal_line:(w,d)=>`${w} font ${d} időpontra`, cta:'Kérem a tervemet' },
-  hr: { header_label:'Vaš plan', headline:'Vaš osobni plan je spreman', subtitle:'Krećete se u pravom smjeru.', guide_text:'Vodit ćemo vas korak po korak kako biste ostali dosljedni i vidjeli napredak.', goal_line:(w,d)=>`${w} lbs do ${d}`, cta:'Preuzmi moj plan' },
-  il: { header_label:'התוכנית שלכם', headline:'התוכנית האישית שלכם מוכנה', subtitle:'אתם נעים בכיוון הנכון.', guide_text:'נלווה אתכם צעד אחר צעד כדי שתוכלו להתמיד ולראות התקדמות.', goal_line:(w,d)=>`${w} ליברות עד ${d}`, cta:'קבלו את התוכנית שלי' },
-  jp: { header_label:'あなたのプラン', headline:'あなた専用のプランが完成しました', subtitle:'順調に前へ進んでいます。', guide_text:'続けやすく、変化を実感できるように、私たちが一歩ずつご案内します。', goal_line:(w,d)=>`${d} までに ${w} lbs`, cta:'プランを見る' },
-  ru: { header_label:'Ваш план', headline:'Ваш персональный план готов', subtitle:'Вы движетесь в правильном направлении.', guide_text:'Мы будем вести вас шаг за шагом, чтобы вам было легче сохранять регулярность и видеть результат.', goal_line:(w,d)=>`${w} фунтов к ${d}`, cta:'Получить мой план' },
-  sk: { header_label:'Váš plán', headline:'Váš osobný plán je pripravený', subtitle:'Idete správnym smerom.', guide_text:'Budeme vás viesť krok za krokom, aby ste vydržali a videli pokrok.', goal_line:(w,d)=>`${w} lb do ${d}`, cta:'Získať môj plán' },
-  tw: { header_label:'您的計畫', headline:'您的個人化計畫已準備完成', subtitle:'您正朝著正確方向前進。', guide_text:'我們會一步一步引導您，幫助您持續下去並看見進展。', goal_line:(w,d)=>`${d} 前達到 ${w} 磅`, cta:'查看我的計畫' },
+  en: { header_label:'Your Plan', headline:'Your personal plan is ready', subtitle:'You are moving in the right direction.', guide_text:'We will guide you step by step so you can stay consistent and see progress.', goal_line:(w,d,u='lbs')=>`${w} ${u} by ${d}`, cta:'Get My Plan' },
+  lt: { header_label:'Jūsų planas', headline:'Jūsų asmeninis planas paruoštas', subtitle:'Judate teisinga kryptimi.', guide_text:'Vesime jus žingsnis po žingsnio, kad galėtumėte išlikti nuoseklūs ir matyti pažangą.', goal_line:(w,d,u='kg')=>`${w} ${u} iki ${d}`, cta:'Gauti mano planą' },
+  lv: { header_label:'Jūsu plāns', headline:'Jūsu personīgais plāns ir gatavs', subtitle:'Jūs virzāties pareizajā virzienā.', guide_text:'Mēs vadīsim jūs soli pa solim, lai jūs varētu saglabāt regularitāti un redzēt progresu.', goal_line:(w,d,u='kg')=>`${w} ${u} līdz ${d}`, cta:'Saņemt manu plānu' },
+  ro: { header_label:'Planul dumneavoastră', headline:'Planul personal este gata', subtitle:'Mergeți în direcția potrivită.', guide_text:'Vă vom ghida pas cu pas, ca să rămâneți consecvenți și să vedeți progresul.', goal_line:(w,d,u='kg')=>`${w} ${u} până la ${d}`, cta:'Vreau planul meu' },
+  cz: { header_label:'Váš plán', headline:'Váš osobní plán je připraven', subtitle:'Jdete správným směrem.', guide_text:'Povedeme vás krok za krokem, abyste vydrželi a viděli pokrok.', goal_line:(w,d,u='kg')=>`${w} ${u} do ${d}`, cta:'Získat můj plán' },
+  dk: { header_label:'Jeres plan', headline:'Jeres personlige plan er klar', subtitle:'I bevæger jer i den rigtige retning.', guide_text:'Vi guider jer trin for trin, så I kan holde fast og se fremgang.', goal_line:(w,d,u='kg')=>`${w} ${u} inden ${d}`, cta:'Få min plan' },
+  gr: { header_label:'Το πλάνο σας', headline:'Το προσωπικό σας πλάνο είναι έτοιμο', subtitle:'Κινείστε προς τη σωστή κατεύθυνση.', guide_text:'Θα σας καθοδηγήσουμε βήμα βήμα, ώστε να παραμείνετε σταθεροί και να βλέπετε πρόοδο.', goal_line:(w,d,u='kg')=>`${w} ${u} έως ${d}`, cta:'Αποκτήστε το πλάνο μου' },
+  hu: { header_label:'Az Ön terve', headline:'Elkészült a személyre szabott terve', subtitle:'Jó irányba halad.', guide_text:'Lépésről lépésre segítünk, hogy kitartson és lássa a fejlődést.', goal_line:(w,d,u='kg')=>`${w} ${u} ${d} időpontra`, cta:'Kérem a tervemet' },
+  hr: { header_label:'Vaš plan', headline:'Vaš osobni plan je spreman', subtitle:'Krećete se u pravom smjeru.', guide_text:'Vodit ćemo vas korak po korak kako biste ostali dosljedni i vidjeli napredak.', goal_line:(w,d,u='kg')=>`${w} ${u} do ${d}`, cta:'Preuzmi moj plan' },
+  il: { header_label:'התוכנית שלכם', headline:'התוכנית האישית שלכם מוכנה', subtitle:'אתם נעים בכיוון הנכון.', guide_text:'נלווה אתכם צעד אחר צעד כדי שתוכלו להתמיד ולראות התקדמות.', goal_line:(w,d,u='kg')=>`${w} ${u} עד ${d}`, cta:'קבלו את התוכנית שלי' },
+  jp: { header_label:'あなたのプラン', headline:'あなた専用のプランが完成しました', subtitle:'順調に前へ進んでいます。', guide_text:'続けやすく、変化を実感できるように、私たちが一歩ずつご案内します。', goal_line:(w,d,u='kg')=>`${d} までに ${w} ${u}`, cta:'プランを見る' },
+  ru: { header_label:'Ваш план', headline:'Ваш персональный план готов', subtitle:'Вы движетесь в правильном направлении.', guide_text:'Мы будем вести вас шаг за шагом, чтобы вам было легче сохранять регулярность и видеть результат.', goal_line:(w,d,u='kg')=>`${w} ${u} к ${d}`, cta:'Получить мой план' },
+  sk: { header_label:'Váš plán', headline:'Váš osobný plán je pripravený', subtitle:'Idete správnym smerom.', guide_text:'Budeme vás viesť krok za krokom, aby ste vydržali a videli pokrok.', goal_line:(w,d,u='kg')=>`${w} ${u} do ${d}`, cta:'Získať môj plán' },
+  tw: { header_label:'您的計畫', headline:'您的個人化計畫已準備完成', subtitle:'您正朝著正確方向前進。', guide_text:'我們會一步一步引導您，幫助您持續下去並看見進展。', goal_line:(w,d,u='kg')=>`${d} 前達到 ${w} ${u}`, cta:'查看我的計畫' },
 }
 
 const results28: Record<LangCode, Results28Translations> = {
