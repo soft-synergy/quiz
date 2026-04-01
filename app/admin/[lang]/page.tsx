@@ -765,6 +765,24 @@ export default function TranslationEditorPage() {
                 </button>
               )}
             </div>
+            <Link
+              href={lang === 'en' ? '/quiz/1' : `/${lang}/quiz/1`}
+              target="_blank"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 8,
+                padding: '8px 14px',
+                fontSize: 13,
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              🔗 Open Quiz
+            </Link>
             <button
               onClick={() => setShowHistory(!showHistory)}
               style={{
