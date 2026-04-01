@@ -624,6 +624,16 @@ const COPY: Record<LangCode, Copy> = {
 
 function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPlan, lang }: { copy: Copy; selected: string; onSelect: (id: string) => void; consent: boolean; onConsent: () => void; selectedPlan: (typeof PLANS)[number]; lang: LangCode }) {
   const checkoutUrl = `https://www.taichiwalkingcoach.com/${lang}-tcwalk-checkout-${selected}`
+  const [showError, setShowError] = useState(false)
+
+  const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!consent) {
+      e.preventDefault()
+      setShowError(true)
+      setTimeout(() => setShowError(false), 600)
+    }
+  }
+
   return (
     <div className={styles.pricingBlock}>
       {PLANS.map((plan, idx) => {
@@ -671,19 +681,19 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
       <a
         className={styles.ctaBtn}
         href={checkoutUrl}
-        onClick={(e) => { if (!consent) e.preventDefault() }}
+        onClick={handleCtaClick}
         aria-disabled={!consent}
       >{copy.cta}</a>
 
       <div
-        className={styles.consentRow}
-        onClick={onConsent}
+        className={`${styles.consentRow} ${showError ? styles.consentRowError : ''}`}
+        onClick={() => { onConsent(); setShowError(false) }}
         role="checkbox"
         aria-checked={consent}
         tabIndex={0}
-        onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onConsent() } }}
+        onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onConsent(); setShowError(false) } }}
       >
-        <div className={`${styles.consentCheck} ${consent ? styles.consentChecked : ''}`} aria-hidden="true">
+        <div className={`${styles.consentCheck} ${consent ? styles.consentChecked : ''} ${showError ? styles.consentCheckError : ''}`} aria-hidden="true">
           {consent && (
             <svg viewBox="0 0 14 14" fill="none" width="14" height="14">
               <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -699,6 +709,7 @@ function PricingBlock({ copy, selected, onSelect, consent, onConsent, selectedPl
           <a href="mailto:hello@taichiwalkingcoach.app" onClick={(e) => e.stopPropagation()}>hello@taichiwalkingcoach.app</a>
         </span>
       </div>
+      {showError && <p className={styles.consentErrorMsg}>Please accept the terms to continue.</p>}
     </div>
   )
 }
