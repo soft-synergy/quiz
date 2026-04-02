@@ -571,7 +571,18 @@ export default function TranslationEditorPage() {
       if (res.ok) {
         setSaveSuccess(true)
         setTimeout(() => setSaveSuccess(false), 3000)
-        await loadData()
+        setData((prev) =>
+          prev
+            ? {
+                ...prev,
+                current: { ...edits },
+                overrides: null,
+              }
+            : prev
+        )
+        setTimeout(() => {
+          loadData()
+        }, 300)
       } else {
         const d = await res.json()
         alert(d.error ?? 'Save failed')

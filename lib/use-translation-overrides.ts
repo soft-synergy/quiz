@@ -1,6 +1,4 @@
 'use client'
-import { useEffect } from 'react'
-import { create } from 'zustand'
 import type { LangCode } from './lang-store'
 import type { QuizStep } from './quiz-data'
 import type {
@@ -12,50 +10,11 @@ import type {
 } from './i18n'
 import type { Review } from './reviews-data'
 
-// ─── Zustand store ─────────────────────────────────────────────────────────
-// Re-fetches on every page mount so admin edits are always reflected.
-// `fetching` prevents concurrent duplicate requests (two components mounting
-// simultaneously for the same lang), but is cleared after each request so
-// the next page navigation triggers a fresh fetch.
-
-interface OverrideStore {
-  data: Partial<Record<string, Record<string, string>>>
-  fetching: Partial<Record<string, true>>
-}
-
-const useOverrideStore = create<OverrideStore>(() => ({ data: {}, fetching: {} }))
-
-function loadLang(lang: string) {
-  // Skip only if there is already an in-flight request for this lang.
-  // Do NOT skip if data[lang] already exists — we want fresh data after
-  // admin edits, so we always re-fetch on each page mount.
-  if (useOverrideStore.getState().fetching[lang]) return
-  useOverrideStore.setState((s) => ({ fetching: { ...s.fetching, [lang]: true } }))
-  fetch(`/translations/${lang}.json`, { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : {}))
-    .then((ov) =>
-      useOverrideStore.setState((s) => ({
-        data: { ...s.data, [lang]: ov },
-        fetching: { ...s.fetching, [lang]: undefined },
-      }))
-    )
-    .catch(() =>
-      useOverrideStore.setState((s) => ({
-        data: { ...s.data, [lang]: {} },
-        fetching: { ...s.fetching, [lang]: undefined },
-      }))
-    )
-}
-
-/** Triggers a fresh fetch on every mount and returns current overrides for `lang`. */
+// Admin now writes directly to the source TypeScript files. The quiz reads those
+// source modules directly, so runtime JSON overrides are intentionally disabled.
 export function useTranslationOverrides(lang: LangCode): Record<string, string> {
-  const data = useOverrideStore((s) => s.data)
-
-  useEffect(() => {
-    loadLang(lang)
-  }, [lang])
-
-  return data[lang] ?? {}
+  void lang
+  return {}
 }
 
 // ─── Section helpers ───────────────────────────────────────────────────────

@@ -17,9 +17,11 @@ async function requireAuth() {
 }
 
 function getOverrideInfo(code: string): { exists: boolean; lastModified?: string } {
-  const filePath = path.join(DATA_DIR, `${code}.json`)
-  if (fs.existsSync(filePath)) {
-    const stat = fs.statSync(filePath)
+  const historyDir = path.join(DATA_DIR, 'history', code)
+  if (fs.existsSync(historyDir)) {
+    const files = fs.readdirSync(historyDir).filter((f) => f.endsWith('.json')).sort()
+    if (files.length === 0) return { exists: false }
+    const stat = fs.statSync(path.join(historyDir, files[files.length - 1]))
     return {
       exists: true,
       lastModified: stat.mtime.toLocaleDateString('en-US', {

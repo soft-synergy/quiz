@@ -178,16 +178,16 @@ function checkI18n() {
 }
 
 // ─── 4. Admin serializer coverage ────────────────────────────────────────────
-// Verifies that serializePaywall() in the admin route:
+// Verifies that serializePaywall()/serializeAll() in the shared admin source module:
 //   a) References every top-level key from the EN Copy object
 //   b) Is called with the lang parameter (not zero-arg)
 //   c) serializeAll() calls serializePaywall(lang)
 function checkAdminSerializer() {
-  console.log('  🔧  Admin serializer (route.ts covers all Copy keys)')
+  console.log('  🔧  Admin serializer (shared source module covers all Copy keys)')
 
-  const routeFile = path.join(ROOT, 'app/api/admin/translations/[lang]/route.ts')
-  if (!fs.existsSync(routeFile)) { err('Admin route file not found'); return }
-  const routeSrc = fs.readFileSync(routeFile, 'utf8')
+  const sourceFile = path.join(ROOT, 'lib/admin/translation-source.ts')
+  if (!fs.existsSync(sourceFile)) { err('translation-source.ts not found'); return }
+  const routeSrc = fs.readFileSync(sourceFile, 'utf8')
 
   // Verify serializePaywall accepts lang param
   if (!/function serializePaywall\s*\(\s*lang\s*[,:)]/m.test(routeSrc)) {
@@ -197,7 +197,7 @@ function checkAdminSerializer() {
   // Verify serializeAll calls serializePaywall(lang)
   const serializeAllBody = extractFunctionBody(routeSrc, 'function serializeAll(')
   if (!serializeAllBody) {
-    err('serializeAll function not found in route.ts')
+    err('serializeAll function not found in translation-source.ts')
   } else if (!/serializePaywall\s*\(\s*lang\s*\)/.test(serializeAllBody)) {
     err('serializeAll does not call serializePaywall(lang) — paywall translations ignore current language')
   }
@@ -237,12 +237,12 @@ function checkAdminSerializer() {
 function checkLoadingReviews() {
   console.log('  📦  serializeAll includes reviews under loading.reviews.*')
 
-  const routeFile = path.join(ROOT, 'app/api/admin/translations/[lang]/route.ts')
-  if (!fs.existsSync(routeFile)) { err('Admin route file not found'); return }
-  const routeSrc = fs.readFileSync(routeFile, 'utf8')
+  const sourceFile = path.join(ROOT, 'lib/admin/translation-source.ts')
+  if (!fs.existsSync(sourceFile)) { err('translation-source.ts not found'); return }
+  const routeSrc = fs.readFileSync(sourceFile, 'utf8')
 
   const serializeAllBody = extractFunctionBody(routeSrc, 'function serializeAll(')
-  if (!serializeAllBody) { err('serializeAll function not found in route.ts'); return }
+  if (!serializeAllBody) { err('serializeAll function not found in translation-source.ts'); return }
 
   // Must reference REVIEWS and loading.reviews
   if (!serializeAllBody.includes('REVIEWS')) {
@@ -251,7 +251,7 @@ function checkLoadingReviews() {
   if (!serializeAllBody.includes('loading.reviews.') && !serializeAllBody.includes('`loading.reviews.')) {
     // Could be in a separate variable before, check the whole file
     if (!routeSrc.includes('loading.reviews.')) {
-      err('route.ts does not serialize reviews under loading.reviews.* prefix')
+      err('translation-source.ts does not serialize reviews under loading.reviews.* prefix')
     }
   }
 }

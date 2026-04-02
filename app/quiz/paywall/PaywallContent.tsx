@@ -9,8 +9,8 @@ import { calcBMI, getBMICategory } from '@/lib/bmi-utils'
 import { useLangStore, type LangCode } from '@/lib/lang-store'
 import { localizeBrandValue } from '@/lib/brand'
 import { LANGUAGES } from '@/lib/i18n'
-import { REVIEWS } from '@/lib/reviews-data'
 import { COPY, EN, type Copy } from '@/lib/paywall-copy'
+import { PAYWALL_STORIES } from '@/lib/paywall-stories-data'
 import { useTranslationOverrides, applyPaywallOverrides } from '@/lib/use-translation-overrides'
 
 const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
@@ -134,14 +134,7 @@ export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: s
   const overrides = useTranslationOverrides(lang)
   const copy = applyPaywallOverrides(localizeBrandValue(COPY[lang] ?? EN, lang), overrides)
 
-  // Paywall story cards — start from 5-star reviews, apply admin overrides if set
-  const baseStories = (REVIEWS[lang] ?? REVIEWS.en).filter((r) => r.stars === 5).slice(0, 3)
-  const stories = baseStories.map((s, i) => ({
-    name:  overrides[`paywall.stories.${i}.name`]  ?? s.name,
-    text:  overrides[`paywall.stories.${i}.text`]  ?? s.text,
-    photo: overrides[`paywall.stories.${i}.photo`] ?? s.photo,
-    stars: overrides[`paywall.stories.${i}.stars`] ? Number(overrides[`paywall.stories.${i}.stars`]) : s.stars,
-  }))
+  const stories = PAYWALL_STORIES[lang] ?? PAYWALL_STORIES.en
   const [selected, setSelected] = useState<string>('12w')
   const [consent, setConsent] = useState(false)
 
