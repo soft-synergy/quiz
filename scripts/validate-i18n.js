@@ -92,16 +92,16 @@ function extractBraceBlock(src, startIdx) {
   return ''
 }
 
-// ─── 1. PaywallContent.tsx ────────────────────────────────────────────────────
+// ─── 1. lib/paywall-copy.ts (previously PaywallContent.tsx) ──────────────────
 function checkPaywall() {
-  console.log('  📋  PaywallContent.tsx')
-  const file = path.join(ROOT, 'app/quiz/paywall/PaywallContent.tsx')
-  if (!fs.existsSync(file)) { err('PaywallContent.tsx not found'); return }
+  console.log('  📋  lib/paywall-copy.ts')
+  const file = path.join(ROOT, 'lib/paywall-copy.ts')
+  if (!fs.existsSync(file)) { err('lib/paywall-copy.ts not found'); return }
   const src = fs.readFileSync(file, 'utf8')
 
   // Extract EN's top-level keys
-  const enIdx = src.indexOf('const EN: Copy = {')
-  if (enIdx === -1) { err('Cannot find EN object in PaywallContent.tsx'); return }
+  const enIdx = src.indexOf('export const EN: Copy = {')
+  if (enIdx === -1) { err('Cannot find EN object in lib/paywall-copy.ts'); return }
   const enBlock = extractBraceBlock(src, enIdx)
   const enKeys  = topLevelKeys(enBlock)
 
@@ -109,31 +109,31 @@ function checkPaywall() {
     if (lang === 'en') continue
     const marker   = `  ${lang}: localize(EN,`
     const startIdx = src.indexOf(marker)
-    if (startIdx === -1) { err(`PaywallContent: "${lang}" missing from COPY`); continue }
+    if (startIdx === -1) { err(`paywall-copy: "${lang}" missing from COPY`); continue }
 
     // marker ends right before the overrides object: `  lt: localize(EN, {`
     // so the first `{` after startIdx+marker.length is the overrides block
     const block = extractBraceBlock(src, startIdx + marker.length)
     const langKeys = topLevelKeys(block)
     const missing  = enKeys.filter(k => !langKeys.includes(k))
-    if (missing.length > 0) err(`PaywallContent [${lang}] missing: ${missing.join(', ')}`)
+    if (missing.length > 0) err(`paywall-copy [${lang}] missing: ${missing.join(', ')}`)
   }
 }
 
-// ─── 2. ReviewCarousel.tsx ────────────────────────────────────────────────────
+// ─── 2. lib/reviews-data.ts (previously ReviewCarousel.tsx) ──────────────────
 function checkReviews() {
-  console.log('  🎠  ReviewCarousel.tsx')
-  const file = path.join(ROOT, 'components/ReviewCarousel/ReviewCarousel.tsx')
-  if (!fs.existsSync(file)) { err('ReviewCarousel.tsx not found'); return }
+  console.log('  🎠  lib/reviews-data.ts')
+  const file = path.join(ROOT, 'lib/reviews-data.ts')
+  if (!fs.existsSync(file)) { err('lib/reviews-data.ts not found'); return }
   const src = fs.readFileSync(file, 'utf8')
 
   const reviewsIdx = src.indexOf('export const REVIEWS')
-  if (reviewsIdx === -1) { err('Cannot find REVIEWS in ReviewCarousel.tsx'); return }
+  if (reviewsIdx === -1) { err('Cannot find REVIEWS in lib/reviews-data.ts'); return }
   const block = extractBraceBlock(src, reviewsIdx)
 
   for (const lang of LANG_CODES) {
     if (!new RegExp(`^\\s+${lang}\\s*:`,'m').test(block))
-      err(`ReviewCarousel REVIEWS: language "${lang}" missing`)
+      err(`reviews-data REVIEWS: language "${lang}" missing`)
   }
 }
 

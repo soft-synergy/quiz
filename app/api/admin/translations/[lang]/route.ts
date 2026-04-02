@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import fs from 'fs'
 import path from 'path'
+import { COPY } from '@/lib/paywall-copy'
+import { REVIEWS } from '@/lib/reviews-data'
 import {
   useIntroT,
   useUITranslations,
@@ -146,24 +147,98 @@ function flatten(obj: Record<string, unknown>, prefix = ''): Record<string, stri
   return result
 }
 
-function serializePaywall(): Record<string, string> {
-  return {
-    'paywall.pageTitle': 'Choose your plan with TAICHI COACH',
-    'paywall.pageSub': 'Simple, guided, and made for real life.',
-    'paywall.cta': 'Get my Tai Chi Coach',
-    'paywall.moneyBackRow': '30-day money-back guarantee — Try it with no risk. If it is not right for you, you can get your money back.',
-    'paywall.readyHeading': 'Your plan with TAICHI COACH is ready!',
-    'paywall.bulletTitle': 'With TAICHI COACH, you can:',
-    'paywall.whatYouGet': 'What you get with TAICHI COACH',
-    'paywall.storiesHeading': 'Real stories from people using TAICHI COACH',
-    'paywall.personalHeading': 'Build real results at your own pace',
-    'paywall.guaranteeTitle': '28-Day Money-Back Guarantee',
-    'paywall.guaranteeBody': 'Try TAICHI COACH with no risk. If it is not the right fit for you, you can request a refund within 28 days. Please check our Refund Policy for full details.',
-    'paywall.footer': '© 2026 TAICHI COACH. All rights reserved.',
-    'paywall.socialText': 'Millions of people have already tried simple daily movement routines',
-    'paywall.socialSub': 'And many have seen real progress over time.',
-    'paywall.socialCta': 'Get started now',
+function serializePaywall(lang: LangCode): Record<string, string> {
+  const copy = COPY[lang]
+  const result: Record<string, string> = {}
+
+  // Simple string fields
+  result['paywall.pageTitle'] = copy.pageTitle
+  result['paywall.pageSub'] = copy.pageSub
+  result['paywall.moneyBackRow'] = copy.moneyBackRow
+  result['paywall.cta'] = copy.cta
+  result['paywall.consentPrefix'] = copy.consentPrefix
+  result['paywall.terms'] = copy.terms
+  result['paywall.privacy'] = copy.privacy
+  result['paywall.refund'] = copy.refund
+  result['paywall.consentAnd'] = copy.consentAnd
+  result['paywall.consentError'] = copy.consentError
+  result['paywall.yourResults'] = copy.yourResults
+  result['paywall.primaryGoal'] = copy.primaryGoal
+  result['paywall.fitnessLevel'] = copy.fitnessLevel
+  result['paywall.sleepQuality'] = copy.sleepQuality
+  result['paywall.fitnessAge'] = copy.fitnessAge
+  result['paywall.workoutTitle'] = copy.workoutTitle
+  result['paywall.workoutBadge'] = copy.workoutBadge
+  result['paywall.waterTitle'] = copy.waterTitle
+  result['paywall.waterBadge'] = copy.waterBadge
+  result['paywall.readyHeading'] = copy.readyHeading
+  result['paywall.bulletTitle'] = copy.bulletTitle
+  result['paywall.whatYouGet'] = copy.whatYouGet
+  result['paywall.socialText'] = copy.socialText
+  result['paywall.socialSub'] = copy.socialSub
+  result['paywall.socialCta'] = copy.socialCta
+  result['paywall.storiesHeading'] = copy.storiesHeading
+  result['paywall.guaranteeTitle'] = copy.guaranteeTitle
+  result['paywall.guaranteeBody'] = copy.guaranteeBody
+  result['paywall.footer'] = copy.footer
+
+  // Function fields with placeholders
+  result['paywall.discount'] = copy.discount('__V__')
+  result['paywall.perDay'] = copy.perDay('__V__')
+  result['paywall.consentBody'] = copy.consentBody('__TODAY__', '__RENEW__')
+  result['paywall.fitnessAgeValue'] = copy.fitnessAgeValue('__YEARS__' as unknown as number)
+  result['paywall.personalHeading'] = copy.personalHeading('__NAME__')
+
+  // plans array
+  copy.plans.forEach((plan, i) => {
+    result[`paywall.plans.${i}.name`] = plan.name
+    result[`paywall.plans.${i}.desc`] = plan.desc
+    result[`paywall.plans.${i}.badge`] = plan.badge ?? ''
+  })
+
+  // bullets array
+  copy.bullets.forEach((bullet, i) => {
+    result[`paywall.bullets.${i}`] = bullet
+  })
+
+  // features array
+  copy.features.forEach((feature, i) => {
+    result[`paywall.features.${i}.title`] = feature.title
+    result[`paywall.features.${i}.desc`] = feature.desc
+  })
+
+  // goalLabels
+  for (const [k, v] of Object.entries(copy.goalLabels)) {
+    result[`paywall.goalLabels.${k}`] = v
   }
+
+  // sleepLabels
+  for (const [k, v] of Object.entries(copy.sleepLabels)) {
+    result[`paywall.sleepLabels.${k}`] = v
+  }
+
+  // fitnessLabels
+  for (const [k, v] of Object.entries(copy.fitnessLabels)) {
+    result[`paywall.fitnessLabels.${k}`] = v
+  }
+
+  // bmi
+  const bmiCats = ['Normal', 'Underweight', 'Overweight', 'Obese'] as const
+  for (const cat of bmiCats) {
+    result[`paywall.bmi.${cat}.title`] = copy.bmi[cat].title
+    result[`paywall.bmi.${cat}.text`] = copy.bmi[cat].text('__BMI__')
+  }
+
+  // reviews
+  const reviews = REVIEWS[lang] ?? REVIEWS.en
+  reviews.forEach((review, i) => {
+    result[`paywall.reviews.${i}.name`] = review.name
+    result[`paywall.reviews.${i}.text`] = review.text
+    result[`paywall.reviews.${i}.stars`] = String(review.stars)
+    result[`paywall.reviews.${i}.photo`] = review.photo
+  })
+
+  return result
 }
 
 function serializeAll(lang: LangCode): Record<string, string> {
@@ -205,7 +280,7 @@ function serializeAll(lang: LangCode): Record<string, string> {
     Object.assign(stepsFlat, stepFlat)
   }
 
-  const paywallFlat = serializePaywall()
+  const paywallFlat = serializePaywall(lang)
 
   return {
     ...introFlat,

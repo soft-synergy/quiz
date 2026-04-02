@@ -172,7 +172,7 @@ export function applyWellnessOverrides(
   }
 }
 
-/** paywall — flat string-only keys with personalHeading using __NAME__ placeholder */
+/** paywall — handles all flat keys including functions, arrays, nested objects */
 export function applyPaywallOverrides<T extends Record<string, unknown>>(
   copy: T,
   ov: Record<string, string>
@@ -181,15 +181,83 @@ export function applyPaywallOverrides<T extends Record<string, unknown>>(
   const entries = Object.entries(ov).filter(([k]) => k.startsWith(prefix))
   if (!entries.length) return copy
   const patch: Record<string, unknown> = {}
+
   for (const [k, v] of entries) {
     const key = k.slice(prefix.length)
+
+    // Functions with placeholders
     if (key === 'personalHeading') {
       patch[key] = (name: string) =>
         name ? v.replace('__NAME__', name) : v.replace(/^__NAME__[,，、]?\s*/, '')
-    } else {
+    } else if (key === 'discount') {
+      patch[key] = (val: string) => v.replace('__V__', val)
+    } else if (key === 'perDay') {
+      patch[key] = (val: string) => v.replace('__V__', val)
+    } else if (key === 'consentBody') {
+      patch[key] = (today: string, renew: string) => v.replace('__TODAY__', today).replace('__RENEW__', renew)
+    } else if (key === 'fitnessAgeValue') {
+      patch[key] = (years: number) => v.replace('__YEARS__', String(years))
+    }
+    // Arrays: bullets.0, bullets.1, etc.
+    else if (key.startsWith('bullets.')) {
+      const idx = parseInt(key.slice('bullets.'.length))
+      const bullets = [...((patch.bullets as string[]) ?? (copy as Record<string, unknown>).bullets as string[])]
+      bullets[idx] = v
+      patch.bullets = bullets
+    }
+    // plans.0.name, plans.0.desc, plans.0.badge
+    else if (key.startsWith('plans.')) {
+      const parts = key.split('.')  // ['plans', '0', 'name']
+      const idx = parseInt(parts[1])
+      const field = parts[2]
+      const plans = [...((patch.plans as { name: string; desc: string; badge: string | null }[]) ?? (copy as Record<string, unknown>).plans as { name: string; desc: string; badge: string | null }[])]
+      plans[idx] = { ...plans[idx], [field]: field === 'badge' ? (v || null) : v }
+      patch.plans = plans
+    }
+    // features.0.title, features.0.desc
+    else if (key.startsWith('features.')) {
+      const parts = key.split('.')
+      const idx = parseInt(parts[1])
+      const field = parts[2]
+      const features = [...((patch.features as { title: string; desc: string }[]) ?? (copy as Record<string, unknown>).features as { title: string; desc: string }[])]
+      features[idx] = { ...features[idx], [field]: v }
+      patch.features = features
+    }
+    // goalLabels.lose-weight, etc.
+    else if (key.startsWith('goalLabels.')) {
+      const labelKey = key.slice('goalLabels.'.length)
+      patch.goalLabels = { ...((patch.goalLabels as Record<string, string>) ?? (copy as Record<string, unknown>).goalLabels as Record<string, string>), [labelKey]: v }
+    }
+    else if (key.startsWith('sleepLabels.')) {
+      const labelKey = key.slice('sleepLabels.'.length)
+      patch.sleepLabels = { ...((patch.sleepLabels as Record<string, string>) ?? (copy as Record<string, unknown>).sleepLabels as Record<string, string>), [labelKey]: v }
+    }
+    else if (key.startsWith('fitnessLabels.')) {
+      const labelKey = key.slice('fitnessLabels.'.length)
+      patch.fitnessLabels = { ...((patch.fitnessLabels as Record<string, string>) ?? (copy as Record<string, unknown>).fitnessLabels as Record<string, string>), [labelKey]: v }
+    }
+    // bmi.Normal.title, bmi.Normal.text
+    else if (key.startsWith('bmi.')) {
+      const parts = key.split('.')  // ['bmi', 'Normal', 'title'|'text']
+      const cat = parts[1]
+      const field = parts[2]
+      const bmi = { ...((patch.bmi as Record<string, unknown>) ?? (copy as Record<string, unknown>).bmi as Record<string, unknown>) }
+      const catObj = { ...(bmi[cat] as Record<string, unknown> ?? {}) }
+      if (field === 'text') {
+        catObj.text = (b: string) => v.replace('__BMI__', b)
+      } else {
+        catObj[field] = v
+      }
+      bmi[cat] = catObj
+      patch.bmi = bmi
+    }
+    // reviews.0.name, etc. — skip, reviews are read-only in admin
+    else if (!key.startsWith('reviews.')) {
+      // Simple string fields
       patch[key] = v
     }
   }
+
   return { ...(copy as object), ...patch } as T
 }
 

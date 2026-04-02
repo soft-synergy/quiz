@@ -42,6 +42,7 @@ type Section =
   | 'Email'
   | 'Quiz Steps'
   | 'Paywall'
+  | 'Reviews'
 
 const SECTION_PREFIXES: Record<Section, string> = {
   Intro: 'intro.',
@@ -54,6 +55,7 @@ const SECTION_PREFIXES: Record<Section, string> = {
   Email: 'email.',
   'Quiz Steps': 'steps.',
   Paywall: 'paywall.',
+  Reviews: 'paywall.reviews.',
 }
 
 const ALL_SECTIONS: Section[] = [
@@ -67,6 +69,7 @@ const ALL_SECTIONS: Section[] = [
   'Email',
   'UI',
   'Paywall',
+  'Reviews',
 ]
 
 function filterBySection(data: Record<string, string>, section: Section): Record<string, string> {
@@ -851,7 +854,7 @@ export default function TranslationEditorPage() {
       </div>
 
       {/* Placeholder note */}
-      {section === 'Paywall' && (
+      {(section === 'Paywall' || section === 'Reviews') && (
         <div
           style={{
             background: '#eff6ff',
@@ -860,12 +863,18 @@ export default function TranslationEditorPage() {
           }}
         >
           <div style={{ maxWidth: 1400, margin: '0 auto', fontSize: 12, color: '#1d4ed8' }}>
-            Placeholders:{' '}
-            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>
-              __NAME__
-            </code>{' '}
-            in <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>personalHeading</code>{' '}
-            — will be replaced with the user&apos;s name at runtime.
+            {section === 'Reviews' ? (
+              <>Reviews are shown read-only. To edit reviews, update the source data in <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>lib/reviews-data.ts</code>.</>
+            ) : (
+              <>Placeholders:{' '}
+                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__NAME__</code>{' '}
+                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__V__</code>{' '}
+                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__TODAY__</code>{' '}
+                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__RENEW__</code>{' '}
+                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__YEARS__</code>{' '}
+                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__BMI__</code>{' '}
+                — keep these tokens in your translation, they will be replaced at runtime.</>
+            )}
           </div>
         </div>
       )}
