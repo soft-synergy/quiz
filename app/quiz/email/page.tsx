@@ -7,12 +7,14 @@ import QuizFooter from '@/components/QuizFooter/QuizFooter'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore } from '@/lib/lang-store'
 import { useEmailT } from '@/lib/i18n'
+import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
 
 export default function EmailPage() {
   const router = useRouter()
   const setDirection = useQuizStore((s) => s.setDirection)
   const lang = useLangStore((s) => s.lang)
-  const t = useEmailT(lang)
+  const ov = useTranslationOverrides(lang)
+  const t = applyFlatSection(useEmailT(lang), ov, 'email.')
   const [email, setEmail] = useState('')
 
   const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)

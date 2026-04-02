@@ -8,7 +8,9 @@ import type {
   ResultTranslations,
   Results28Translations,
   WellnessTranslations,
+  LoadingTranslations,
 } from './i18n'
+import type { Review } from './reviews-data'
 
 // ─── Zustand store ─────────────────────────────────────────────────────────
 // Shared across all components — only one fetch per lang per session.
@@ -170,6 +172,27 @@ export function applyWellnessOverrides(
       low: o('motivation.low') ?? t.motivation.low,
     },
   }
+}
+
+/** loading — handles loading.* text keys and loading.reviews.N.* keys */
+export function applyLoadingOverrides(
+  t: LoadingTranslations,
+  reviews: Review[],
+  ov: Record<string, string>
+): { t: LoadingTranslations; reviews: Review[] } {
+  const newT = applyFlatSection(t, ov, 'loading.')
+  const newReviews = [...reviews]
+  for (const [k, v] of Object.entries(ov)) {
+    if (k.startsWith('loading.reviews.')) {
+      const parts = k.split('.')  // loading, reviews, N, field
+      const idx = parseInt(parts[2])
+      const field = parts[3]
+      if (!isNaN(idx) && field) {
+        newReviews[idx] = { ...newReviews[idx], [field]: field === 'stars' ? Number(v) : v }
+      }
+    }
+  }
+  return { t: newT, reviews: newReviews }
 }
 
 /** paywall — handles all flat keys including functions, arrays, nested objects */

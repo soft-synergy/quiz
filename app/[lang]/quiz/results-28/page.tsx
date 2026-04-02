@@ -84,7 +84,8 @@ export default function Results28Page() {
   const params = useParams()
   const routeLang = params.lang as LangCode
   const setDirection = useQuizStore((s) => s.setDirection)
-  const t = useResults28T(routeLang)
+  const ov = useTranslationOverrides(routeLang)
+  const t = applyResults28Overrides(useResults28T(routeLang), ov)
 
   const base = `/${routeLang}`
 

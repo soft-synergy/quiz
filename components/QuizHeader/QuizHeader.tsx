@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore } from '@/lib/lang-store'
 import { useUITranslations } from '@/lib/i18n'
+import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
 
 interface Props {
   step?: number
@@ -29,7 +30,8 @@ export default function QuizHeader({
   const router = useRouter()
   const setDirection = useQuizStore((s) => s.setDirection)
   const lang = useLangStore((s) => s.lang)
-  const t = useUITranslations(lang)
+  const ov = useTranslationOverrides(lang)
+  const t = applyFlatSection(useUITranslations(lang), ov, 'ui.')
 
   const pct =
     progress !== undefined

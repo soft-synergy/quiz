@@ -8,14 +8,16 @@ import ReviewCarousel from '@/components/ReviewCarousel/ReviewCarousel'
 import { useQuizStore } from '@/lib/quiz-store'
 import type { LangCode } from '@/lib/lang-store'
 import { useLoadingT } from '@/lib/i18n'
-import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
+import { REVIEWS } from '@/lib/reviews-data'
+import { useTranslationOverrides, applyLoadingOverrides } from '@/lib/use-translation-overrides'
 
 export default function LoadingPage() {
   const router = useRouter()
   const params = useParams()
   const routeLang = params.lang as LangCode
   const setDirection = useQuizStore((s) => s.setDirection)
-  const t = useLoadingT(routeLang)
+  const ov = useTranslationOverrides(routeLang)
+  const { t, reviews: reviewsOverridden } = applyLoadingOverrides(useLoadingT(routeLang), REVIEWS[routeLang] ?? REVIEWS.en, ov)
 
   const base = `/${routeLang}/quiz`
 
@@ -36,7 +38,7 @@ export default function LoadingPage() {
         <div className={styles.content}>
           <RingProgress durationMs={6000} onComplete={handleComplete} />
           <h1 className={styles.planTitle}>{t.title}</h1>
-          <ReviewCarousel />
+          <ReviewCarousel reviews={reviewsOverridden} />
         </div>
       </main>
     </>

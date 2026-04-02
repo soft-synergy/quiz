@@ -14,7 +14,8 @@ export default function EmailPage() {
   const params = useParams()
   const routeLang = params.lang as LangCode
   const setDirection = useQuizStore((s) => s.setDirection)
-  const t = useEmailT(routeLang)
+  const ov = useTranslationOverrides(routeLang)
+  const t = applyFlatSection(useEmailT(routeLang), ov, 'email.')
   const [email, setEmail] = useState('')
 
   const base = `/${routeLang}/quiz`

@@ -8,13 +8,15 @@ import BMIScale from '@/components/BMIScale/BMIScale'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore } from '@/lib/lang-store'
 import { useWellnessT } from '@/lib/i18n'
+import { useTranslationOverrides, applyWellnessOverrides } from '@/lib/use-translation-overrides'
 import { calcBMI, getBMICategory } from '@/lib/bmi-utils'
 
 export default function WellnessPage() {
   const router = useRouter()
   const { answers, setDirection, _hydrated } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
-  const t = useWellnessT(lang)
+  const ov = useTranslationOverrides(lang)
+  const t = applyWellnessOverrides(useWellnessT(lang), ov)
 
   useEffect(() => {
     router.prefetch('/quiz/28')

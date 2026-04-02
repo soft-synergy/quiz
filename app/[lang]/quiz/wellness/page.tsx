@@ -16,7 +16,8 @@ export default function WellnessPage() {
   const params = useParams()
   const routeLang = params.lang as LangCode
   const { answers, setDirection, _hydrated } = useQuizStore()
-  const t = useWellnessT(routeLang)
+  const ov = useTranslationOverrides(routeLang)
+  const t = applyWellnessOverrides(useWellnessT(routeLang), ov)
 
   const base = `/${routeLang}/quiz`
 

@@ -227,9 +227,32 @@ function checkAdminSerializer() {
     err(`serializePaywall does not serialize these Copy keys: ${missingKeys.join(', ')}`)
   }
 
-  // Also verify REVIEWS are serialized for each language
-  if (!fnBody.includes('REVIEWS') && !fnBody.includes('reviews')) {
-    err('serializePaywall does not include REVIEWS — admin cannot edit review text')
+  // Verify REVIEWS are NOT serialized under paywall.reviews.* (they belong under loading.reviews.*)
+  if (/paywall\.reviews\.\$\{i\}/.test(fnBody) || /`paywall\.reviews\./.test(fnBody)) {
+    err('serializePaywall serializes reviews under paywall.reviews.* — reviews must be under loading.reviews.* instead')
+  }
+}
+
+// ─── 4b. serializeAll includes reviews under loading.reviews.* ───────────────
+function checkLoadingReviews() {
+  console.log('  📦  serializeAll includes reviews under loading.reviews.*')
+
+  const routeFile = path.join(ROOT, 'app/api/admin/translations/[lang]/route.ts')
+  if (!fs.existsSync(routeFile)) { err('Admin route file not found'); return }
+  const routeSrc = fs.readFileSync(routeFile, 'utf8')
+
+  const serializeAllBody = extractFunctionBody(routeSrc, 'function serializeAll(')
+  if (!serializeAllBody) { err('serializeAll function not found in route.ts'); return }
+
+  // Must reference REVIEWS and loading.reviews
+  if (!serializeAllBody.includes('REVIEWS')) {
+    err('serializeAll does not include REVIEWS — reviews will not appear under loading.reviews.*')
+  }
+  if (!serializeAllBody.includes('loading.reviews.') && !serializeAllBody.includes('`loading.reviews.')) {
+    // Could be in a separate variable before, check the whole file
+    if (!routeSrc.includes('loading.reviews.')) {
+      err('route.ts does not serialize reviews under loading.reviews.* prefix')
+    }
   }
 }
 
@@ -344,6 +367,7 @@ checkPaywall()
 checkReviews()
 checkI18n()
 checkAdminSerializer()
+checkLoadingReviews()
 checkApplyOverrides()
 checkTypes()
 checkHardcoded()

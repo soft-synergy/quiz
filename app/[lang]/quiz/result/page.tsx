@@ -15,7 +15,8 @@ export default function ResultPage() {
   const params = useParams()
   const routeLang = params.lang as LangCode
   const { answers, weightUnit, _hydrated } = useQuizStore()
-  const t = useResultT(routeLang)
+  const ov = useTranslationOverrides(routeLang)
+  const t = applyResultOverrides(useResultT(routeLang), ov)
 
   const base = `/${routeLang}/quiz`
 

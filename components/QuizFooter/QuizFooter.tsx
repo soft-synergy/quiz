@@ -2,6 +2,7 @@
 import styles from './QuizFooter.module.css'
 import { useLangStore } from '@/lib/lang-store'
 import { useUITranslations } from '@/lib/i18n'
+import { useTranslationOverrides, applyFlatSection } from '@/lib/use-translation-overrides'
 
 interface Props {
   disabled?: boolean
@@ -21,7 +22,8 @@ export default function QuizFooter({
   sticky = true,
 }: Props) {
   const lang = useLangStore((s) => s.lang)
-  const t = useUITranslations(lang)
+  const ov = useTranslationOverrides(lang)
+  const t = applyFlatSection(useUITranslations(lang), ov, 'ui.')
 
   return (
     <footer className={sticky ? styles.footer : styles.footerInline}>

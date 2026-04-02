@@ -28,7 +28,7 @@ function Avatar({ src, alt }: { src: string; alt: string }) {
   )
 }
 
-export default function ReviewCarousel() {
+export default function ReviewCarousel({ reviews: reviewsProp }: { reviews?: import('@/lib/reviews-data').Review[] } = {}) {
   const { lang: storeLang, setLang } = useLangStore()
   const params = useParams()
 
@@ -45,7 +45,7 @@ export default function ReviewCarousel() {
     return (urlLang && VALID_LANGS.has(urlLang) ? urlLang : storeLang) as LangCode
   })()
 
-  const reviews = REVIEWS[lang] ?? REVIEWS.en
+  const reviews = reviewsProp ?? REVIEWS[lang] ?? REVIEWS.en
   const reviewsLabel = lang === 'jp' ? 'お客様のレビュー' : lang === 'ru' ? 'Отзывы пользователей' : lang === 'tw' ? '用戶評價' : lang === 'il' ? 'ביקורות משתמשים' : lang === 'lt' ? 'Klientų atsiliepimai' : 'Customer reviews'
   const trustpilotLabel = lang === 'jp' ? 'Trustpilot' : lang === 'ru' ? 'Trustpilot' : lang === 'tw' ? 'Trustpilot' : lang === 'il' ? 'Trustpilot' : lang === 'lt' ? 'Trustpilot' : 'Trustpilot'
   const outerRef = useRef<HTMLDivElement>(null)

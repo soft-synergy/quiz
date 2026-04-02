@@ -42,7 +42,6 @@ type Section =
   | 'Email'
   | 'Quiz Steps'
   | 'Paywall'
-  | 'Reviews'
 
 const SECTION_PREFIXES: Record<Section, string> = {
   Intro: 'intro.',
@@ -55,7 +54,6 @@ const SECTION_PREFIXES: Record<Section, string> = {
   Email: 'email.',
   'Quiz Steps': 'steps.',
   Paywall: 'paywall.',
-  Reviews: 'paywall.reviews.',
 }
 
 const ALL_SECTIONS: Section[] = [
@@ -64,12 +62,11 @@ const ALL_SECTIONS: Section[] = [
   'Step Page',
   'Loading',
   'Result',
-  'Wellness',
   '28-Day',
+  'Wellness',
   'Email',
-  'UI',
   'Paywall',
-  'Reviews',
+  'UI',
 ]
 
 function filterBySection(data: Record<string, string>, section: Section): Record<string, string> {
@@ -854,7 +851,7 @@ export default function TranslationEditorPage() {
       </div>
 
       {/* Placeholder note */}
-      {(section === 'Paywall' || section === 'Reviews') && (
+      {section === 'Paywall' && (
         <div
           style={{
             background: '#eff6ff',
@@ -863,18 +860,27 @@ export default function TranslationEditorPage() {
           }}
         >
           <div style={{ maxWidth: 1400, margin: '0 auto', fontSize: 12, color: '#1d4ed8' }}>
-            {section === 'Reviews' ? (
-              <>Reviews are shown read-only. To edit reviews, update the source data in <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>lib/reviews-data.ts</code>.</>
-            ) : (
-              <>Placeholders:{' '}
-                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__NAME__</code>{' '}
-                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__V__</code>{' '}
-                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__TODAY__</code>{' '}
-                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__RENEW__</code>{' '}
-                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__YEARS__</code>{' '}
-                <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__BMI__</code>{' '}
-                — keep these tokens in your translation, they will be replaced at runtime.</>
-            )}
+            Placeholders:{' '}
+            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__NAME__</code>{' '}
+            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__V__</code>{' '}
+            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__TODAY__</code>{' '}
+            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__RENEW__</code>{' '}
+            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__YEARS__</code>{' '}
+            <code style={{ background: '#dbeafe', padding: '1px 5px', borderRadius: 3 }}>__BMI__</code>{' '}
+            — keep these tokens in your translation, they will be replaced at runtime.
+          </div>
+        </div>
+      )}
+      {section === 'Loading' && (
+        <div
+          style={{
+            background: '#eff6ff',
+            borderBottom: '1px solid #dbeafe',
+            padding: '8px 24px',
+          }}
+        >
+          <div style={{ maxWidth: 1400, margin: '0 auto', fontSize: 12, color: '#1d4ed8' }}>
+            This section includes the loading screen text and customer reviews (shown in the carousel during loading).
           </div>
         </div>
       )}

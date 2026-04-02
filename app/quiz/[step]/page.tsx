@@ -7,6 +7,7 @@ import { QUIZ_STEPS, TOTAL_STEPS, QUIZ_PHASE1_END } from '@/lib/quiz-data'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore } from '@/lib/lang-store'
 import { getTranslatedSteps, useStepPageT } from '@/lib/i18n'
+import { useTranslationOverrides, applyStepOverrides, applyStepPageOverrides } from '@/lib/use-translation-overrides'
 import { calcBMI, getBMICategory, toCanonical, fromCanonical, splitFtIn } from '@/lib/bmi-utils'
 import QuizHeader from '@/components/QuizHeader/QuizHeader'
 import QuizFooter from '@/components/QuizFooter/QuizFooter'
@@ -21,14 +22,17 @@ const WEIGHT_STEP = 24
 function StepContent({
   stepNum,
   navigate,
+  ov,
 }: {
   stepNum: number
   navigate: (dir: 'forward' | 'backward') => void
+  ov: Record<string, string>
 }) {
   const { answers, setAnswer, setWeightUnit } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
-  const t = useStepPageT(lang)
-  const translatedSteps = useMemo(() => getTranslatedSteps(lang), [lang])
+  const rawT = useStepPageT(lang)
+  const t = useMemo(() => applyStepPageOverrides(rawT, ov), [rawT, ov])
+  const translatedSteps = useMemo(() => getTranslatedSteps(lang).map((s) => applyStepOverrides(s, ov)), [lang, ov])
   const stepData = translatedSteps.find((s) => s.step === stepNum)
 
   const savedAnswer = answers[stepNum]
@@ -488,6 +492,8 @@ export default function QuizStepPage() {
   const pathname = usePathname()
   const router = useRouter()
   const { setDirection, setCurrentStep } = useQuizStore()
+  const lang = useLangStore((s) => s.lang)
+  const ov = useTranslationOverrides(lang)
 
   const [stepNum, setStepNum] = useState(Number(params.step))
 
@@ -552,7 +558,7 @@ export default function QuizStepPage() {
         overlay={isInterstitialStep}
         onBack={() => navigate('backward')}
       />
-      <StepContent key={stepNum} stepNum={stepNum} navigate={navigate} />
+      <StepContent key={stepNum} stepNum={stepNum} navigate={navigate} ov={ov} />
     </>
   )
 }

@@ -229,15 +229,6 @@ function serializePaywall(lang: LangCode): Record<string, string> {
     result[`paywall.bmi.${cat}.text`] = copy.bmi[cat].text('__BMI__')
   }
 
-  // reviews
-  const reviews = REVIEWS[lang] ?? REVIEWS.en
-  reviews.forEach((review, i) => {
-    result[`paywall.reviews.${i}.name`] = review.name
-    result[`paywall.reviews.${i}.text`] = review.text
-    result[`paywall.reviews.${i}.stars`] = String(review.stars)
-    result[`paywall.reviews.${i}.photo`] = review.photo
-  })
-
   return result
 }
 
@@ -270,7 +261,18 @@ function serializeAll(lang: LangCode): Record<string, string> {
   for (const [k, v] of Object.entries(serializeWellness(wellnessT))) {
     wellnessFlat[`wellness.${k}`] = v
   }
+  // loading text keys
   const loadingFlat = flatten(loading as unknown as Record<string, unknown>, 'loading')
+  // reviews under loading.reviews.*
+  const reviews = REVIEWS[lang] ?? REVIEWS.en
+  const reviewsFlat: Record<string, string> = {}
+  reviews.forEach((review, i) => {
+    reviewsFlat[`loading.reviews.${i}.name`] = review.name
+    reviewsFlat[`loading.reviews.${i}.text`] = review.text
+    reviewsFlat[`loading.reviews.${i}.stars`] = String(review.stars)
+    reviewsFlat[`loading.reviews.${i}.photo`] = review.photo
+  })
+
   const emailFlat = flatten(emailT as unknown as Record<string, unknown>, 'email')
 
   const stepsFlat: Record<string, string> = {}
@@ -282,17 +284,19 @@ function serializeAll(lang: LangCode): Record<string, string> {
 
   const paywallFlat = serializePaywall(lang)
 
+  // Order: intro, steps, stepPage, loading (incl reviews), result, results28, wellness, email, paywall, ui
   return {
     ...introFlat,
-    ...uiFlat,
+    ...stepsFlat,
     ...stepPageFlat,
+    ...loadingFlat,
+    ...reviewsFlat,
     ...resultFlat,
     ...results28Flat,
     ...wellnessFlat,
-    ...loadingFlat,
     ...emailFlat,
-    ...stepsFlat,
     ...paywallFlat,
+    ...uiFlat,
   }
 }
 

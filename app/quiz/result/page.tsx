@@ -7,13 +7,15 @@ import WeightChart from '@/components/WeightChart/WeightChart'
 import { useQuizStore } from '@/lib/quiz-store'
 import { useLangStore } from '@/lib/lang-store'
 import { useResultT } from '@/lib/i18n'
+import { useTranslationOverrides, applyResultOverrides } from '@/lib/use-translation-overrides'
 import { getGoalDate, fromCanonical } from '@/lib/bmi-utils'
 
 export default function ResultPage() {
   const router = useRouter()
   const { answers, weightUnit, _hydrated } = useQuizStore()
   const lang = useLangStore((s) => s.lang)
-  const t = useResultT(lang)
+  const ov = useTranslationOverrides(lang)
+  const t = applyResultOverrides(useResultT(lang), ov)
 
   if (!_hydrated) return null
 
@@ -22,9 +24,6 @@ export default function ResultPage() {
   const goalDate = getGoalDate(startWeight, goalWeight)
 
   // Convert canonical lbs values to the user's chosen unit for display
-  const displayStart = weightUnit === 'kg'
-    ? Math.round(Number(fromCanonical(String(startWeight), 'kg', 'lbs')))
-    : startWeight
   const displayGoal = weightUnit === 'kg'
     ? Math.round(Number(fromCanonical(String(goalWeight), 'kg', 'lbs')))
     : goalWeight
@@ -39,7 +38,7 @@ export default function ResultPage() {
 
           <div className={styles.goalDisplay}>
             <div className={styles.goalWeightLine}>
-              {displayGoal} {weightUnit} by {goalDate}
+              {t.goal_line(displayGoal, goalDate, weightUnit)}
             </div>
             <div className={styles.goalTagline}>{t.guide_text}</div>
           </div>
