@@ -133,6 +133,15 @@ export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: s
 
   const overrides = useTranslationOverrides(lang)
   const copy = applyPaywallOverrides(localizeBrandValue(COPY[lang] ?? EN, lang), overrides)
+
+  // Paywall story cards — start from 5-star reviews, apply admin overrides if set
+  const baseStories = (REVIEWS[lang] ?? REVIEWS.en).filter((r) => r.stars === 5).slice(0, 3)
+  const stories = baseStories.map((s, i) => ({
+    name:  overrides[`paywall.stories.${i}.name`]  ?? s.name,
+    text:  overrides[`paywall.stories.${i}.text`]  ?? s.text,
+    photo: overrides[`paywall.stories.${i}.photo`] ?? s.photo,
+    stars: overrides[`paywall.stories.${i}.stars`] ? Number(overrides[`paywall.stories.${i}.stars`]) : s.stars,
+  }))
   const [selected, setSelected] = useState<string>('12w')
   const [consent, setConsent] = useState(false)
 
@@ -287,8 +296,8 @@ export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: s
           <div className={styles.block}>
             <h2 className={styles.heading}>{copy.storiesHeading}</h2>
 
-            {(REVIEWS[lang] ?? REVIEWS.en).filter((r) => r.stars === 5).slice(0, 3).map((r, i) => (
-              <div key={r.name} className={styles.reviewCard}>
+            {stories.map((r, i) => (
+              <div key={i} className={styles.reviewCard}>
                 <div className={styles.reviewTop}>
                   <div className={styles.reviewer}>
                     <div className={styles.reviewAvatar}>

@@ -178,6 +178,17 @@ function serializePaywall(lang: LangCode): Record<string, string> {
   result['paywall.socialSub'] = copy.socialSub
   result['paywall.socialCta'] = copy.socialCta
   result['paywall.storiesHeading'] = copy.storiesHeading
+
+  // paywall story cards (3 five-star reviews shown under storiesHeading)
+  // these are separate from loading.reviews.* carousel entries
+  const paywallStories = (REVIEWS[lang] ?? REVIEWS.en).filter((r) => r.stars === 5).slice(0, 3)
+  paywallStories.forEach((s, i) => {
+    result[`paywall.stories.${i}.name`] = s.name
+    result[`paywall.stories.${i}.text`] = s.text
+    result[`paywall.stories.${i}.photo`] = s.photo
+    result[`paywall.stories.${i}.stars`] = String(s.stars)
+  })
+
   result['paywall.guaranteeTitle'] = copy.guaranteeTitle
   result['paywall.guaranteeBody'] = copy.guaranteeBody
   result['paywall.footer'] = copy.footer
