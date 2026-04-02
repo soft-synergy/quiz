@@ -417,7 +417,9 @@ function buildI18nSections(flat: Record<string, string>) {
   const result = parsePrefixed(flat, 'result.')
   const results28 = parsePrefixed(flat, 'results28.')
   const wellness = parsePrefixed(flat, 'wellness.')
-  const loading = parsePrefixed(flat, 'loading.')
+  const loading = Object.fromEntries(
+    Object.entries(parsePrefixed(flat, 'loading.')).filter(([k]) => !k.startsWith('reviews.'))
+  )
   const email = parsePrefixed(flat, 'email.')
   const steps = parsePrefixed(flat, 'steps.')
   return { intro, ui, stepPage, result, results28, wellness, loading, email, steps }

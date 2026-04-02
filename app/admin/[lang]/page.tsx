@@ -31,6 +31,38 @@ interface HistorySnapshot {
   overrides: Record<string, string>
 }
 
+function getBasePreviewPath(lang: string) {
+  return lang === 'en' ? '/quiz' : `/${lang}/quiz`
+}
+
+function getPreviewUrl(section: Section, lang: string, selectedStep: number | null) {
+  const base = getBasePreviewPath(lang)
+  switch (section) {
+    case 'Intro':
+      return lang === 'en' ? '/' : `/${lang}`
+    case 'Quiz Steps':
+      return `${base}/${selectedStep ?? 1}`
+    case 'Step Page':
+      return `${base}/${selectedStep ?? 23}`
+    case 'Loading':
+      return `${base}/loading-screen`
+    case 'Wellness':
+      return `${base}/wellness`
+    case 'Result':
+      return `${base}/result`
+    case 'Email':
+      return `${base}/email`
+    case '28-Day':
+      return `${base}/results-28`
+    case 'Paywall':
+      return `${base}/paywall`
+    case 'UI':
+      return `${base}/1`
+    default:
+      return lang === 'en' ? '/' : `/${lang}`
+  }
+}
+
 type Section =
   | 'Intro'
   | 'UI'
@@ -475,6 +507,8 @@ export default function TranslationEditorPage() {
   const [author, setAuthor] = useState('')
   const [showAuthorModal, setShowAuthorModal] = useState(false)
   const [selectedStep, setSelectedStep] = useState<number | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewRefresh, setPreviewRefresh] = useState(0)
 
   const LANGUAGES_META: Record<string, { label: string; flag: string }> = {
     en: { label: 'English', flag: '🇬🇧' },
@@ -571,6 +605,7 @@ export default function TranslationEditorPage() {
       if (res.ok) {
         setSaveSuccess(true)
         setTimeout(() => setSaveSuccess(false), 3000)
+        setPreviewRefresh((v) => v + 1)
         setData((prev) =>
           prev
             ? {
@@ -607,6 +642,9 @@ export default function TranslationEditorPage() {
           Object.entries(data.en).filter((([k]) => k.startsWith(`steps.${selectedStep}.`)))
         )
       : null
+
+  const previewUrl = getPreviewUrl(section, lang, selectedStep)
+  const previewUrlWithRefresh = `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}preview=${previewRefresh}`
 
   if (loading) {
     return (
@@ -781,8 +819,23 @@ export default function TranslationEditorPage() {
                 </button>
               )}
             </div>
+            <button
+              onClick={() => setShowPreview(true)}
+              style={{
+                background: showPreview ? '#6366f1' : 'rgba(255,255,255,0.1)',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 8,
+                padding: '8px 14px',
+                fontSize: 13,
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+            >
+              Open Right Preview
+            </button>
             <Link
-              href={`/${lang}`}
+              href={previewUrl}
               target="_blank"
               style={{
                 background: 'rgba(255,255,255,0.1)',
@@ -795,9 +848,10 @@ export default function TranslationEditorPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
+                fontWeight: 600,
               }}
             >
-              Preview ↗
+              Open In New Tab ↗
             </Link>
             <button
               onClick={() => setShowHistory(!showHistory)}
@@ -934,7 +988,18 @@ export default function TranslationEditorPage() {
       )}
 
       {/* Main content */}
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '24px' }}>
+      <div
+        style={{
+          maxWidth: showPreview ? 1680 : 1400,
+          margin: '0 auto',
+          padding: '24px',
+          display: 'grid',
+          gridTemplateColumns: showPreview ? 'minmax(0, 1fr) 540px' : 'minmax(0, 1fr)',
+          gap: 24,
+          alignItems: 'start',
+        }}
+      >
+        <div>
         {section !== 'Quiz Steps' ? (
           <div
             style={{
@@ -1167,6 +1232,98 @@ export default function TranslationEditorPage() {
                 </div>
               ) : null}
             </div>
+          </div>
+        )}
+        </div>
+
+        {showPreview && (
+          <div
+            style={{
+              position: 'sticky',
+              top: 128,
+              background: '#fff',
+              borderRadius: 12,
+              border: '1px solid #e2e8f0',
+              overflow: 'hidden',
+              minHeight: 720,
+            }}
+          >
+            <div
+              style={{
+                padding: '12px 14px',
+                borderBottom: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                background: '#f8fafc',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>Live Preview</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{previewUrl}</div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={() => setPreviewRefresh((v) => v + 1)}
+                  style={{
+                    background: '#fff',
+                    color: '#334155',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: 8,
+                    padding: '7px 10px',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  Refresh
+                </button>
+                <Link
+                  href={previewUrl}
+                  target="_blank"
+                  style={{
+                    background: '#6366f1',
+                    color: '#fff',
+                    borderRadius: 8,
+                    padding: '7px 10px',
+                    fontSize: 12,
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                  }}
+                >
+                  Open ↗
+                </Link>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  style={{
+                    background: '#fff',
+                    color: '#334155',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: 8,
+                    padding: '7px 10px',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
+            <iframe
+              key={previewUrlWithRefresh}
+              title="Quiz preview"
+              src={previewUrlWithRefresh}
+              style={{
+                width: '100%',
+                height: 'calc(100vh - 210px)',
+                minHeight: 720,
+                border: 0,
+                background: '#fff',
+              }}
+            />
           </div>
         )}
       </div>

@@ -90,6 +90,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ lan
 
   const langCode = lang as LangCode
   const timestamp = new Date().toISOString()
+  const expected = serializeAll(langCode)
+  const missingKeys = Object.keys(expected).filter((key) => !(key in overrides))
+  if (missingKeys.length > 0) {
+    return NextResponse.json(
+      {
+        error: `Incomplete translation payload: missing ${missingKeys.length} keys`,
+        missingKeys: missingKeys.slice(0, 20),
+      },
+      { status: 400 }
+    )
+  }
 
   const flatByLang = getAllSerializedTranslations()
   flatByLang[langCode] = overrides

@@ -107,12 +107,17 @@ function checkPaywall() {
 
   if (enKeys.length === 0) { err('Could not extract any keys from EN object'); return }
 
+  const copyIdx = src.indexOf('export const COPY: Record<LangCode, Copy> = {')
+  if (copyIdx === -1) { err('Cannot find COPY object in lib/paywall-copy.ts'); return }
+  const copyBlock = extractBraceBlock(src, copyIdx)
+
   for (const lang of LANG_CODES) {
-    if (lang === 'en') continue
-    const marker   = `  ${lang}: localize(EN,`
-    const startIdx = src.indexOf(marker)
+    const marker = `${lang}:`
+    const startIdx = copyBlock.indexOf(marker)
     if (startIdx === -1) { err(`paywall-copy: "${lang}" missing from COPY`); continue }
-    const block = extractBraceBlock(src, startIdx + marker.length)
+    if (lang === 'en') continue
+
+    const block = extractBraceBlock(copyBlock, startIdx + marker.length)
     const langKeys = topLevelKeys(block)
     const missing  = enKeys.filter(k => !langKeys.includes(k))
     if (missing.length > 0) err(`paywall-copy [${lang}] missing keys: ${missing.join(', ')}`)
