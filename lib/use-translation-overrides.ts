@@ -13,27 +13,41 @@ import type {
 import type { Review } from './reviews-data'
 
 // ─── Zustand store ─────────────────────────────────────────────────────────
-// Shared across all components — only one fetch per lang per session.
+// Re-fetches on every page mount so admin edits are always reflected.
+// `fetching` prevents concurrent duplicate requests (two components mounting
+// simultaneously for the same lang), but is cleared after each request so
+// the next page navigation triggers a fresh fetch.
 
 interface OverrideStore {
   data: Partial<Record<string, Record<string, string>>>
+  fetching: Partial<Record<string, true>>
 }
 
-const useOverrideStore = create<OverrideStore>(() => ({ data: {} }))
-
-// Module-level guard so we never fire duplicate requests
-const started: Partial<Record<string, true>> = {}
+const useOverrideStore = create<OverrideStore>(() => ({ data: {}, fetching: {} }))
 
 function loadLang(lang: string) {
-  if (lang in useOverrideStore.getState().data || started[lang]) return
-  started[lang] = true
+  // Skip only if there is already an in-flight request for this lang.
+  // Do NOT skip if data[lang] already exists — we want fresh data after
+  // admin edits, so we always re-fetch on each page mount.
+  if (useOverrideStore.getState().fetching[lang]) return
+  useOverrideStore.setState((s) => ({ fetching: { ...s.fetching, [lang]: true } }))
   fetch(`/translations/${lang}.json`, { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : {}))
-    .then((ov) => useOverrideStore.setState((s) => ({ data: { ...s.data, [lang]: ov } })))
-    .catch(() => useOverrideStore.setState((s) => ({ data: { ...s.data, [lang]: {} } })))
+    .then((ov) =>
+      useOverrideStore.setState((s) => ({
+        data: { ...s.data, [lang]: ov },
+        fetching: { ...s.fetching, [lang]: undefined },
+      }))
+    )
+    .catch(() =>
+      useOverrideStore.setState((s) => ({
+        data: { ...s.data, [lang]: {} },
+        fetching: { ...s.fetching, [lang]: undefined },
+      }))
+    )
 }
 
-/** Triggers the fetch (idempotent) and returns current overrides for `lang`. */
+/** Triggers a fresh fetch on every mount and returns current overrides for `lang`. */
 export function useTranslationOverrides(lang: LangCode): Record<string, string> {
   const data = useOverrideStore((s) => s.data)
 
