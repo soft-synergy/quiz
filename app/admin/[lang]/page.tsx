@@ -56,17 +56,19 @@ const SECTION_PREFIXES: Record<Section, string> = {
   Paywall: 'paywall.',
 }
 
+// Order matches the actual quiz flow:
+// Intro → Quiz Steps → Loading Screen → Wellness → Result → plan-loading → Email → 28-Day → Paywall
 const ALL_SECTIONS: Section[] = [
-  'Intro',
-  'Quiz Steps',
-  'Step Page',
-  'Loading',
-  'Result',
-  '28-Day',
-  'Wellness',
-  'Email',
-  'Paywall',
-  'UI',
+  'Intro',        // landing page
+  'Quiz Steps',   // questions 1-N
+  'Step Page',    // BMI, consent, goal weight inputs (inside quiz steps)
+  'Loading',      // loading screen + review carousel
+  'Wellness',     // wellness profile page
+  'Result',       // BMI result → continue to plan-loading
+  'Email',        // email capture
+  '28-Day',       // 28-day results → paywall
+  'Paywall',      // paywall + story cards
+  'UI',           // shared UI labels (back, continue, skip…)
 ]
 
 function filterBySection(data: Record<string, string>, section: Section): Record<string, string> {
