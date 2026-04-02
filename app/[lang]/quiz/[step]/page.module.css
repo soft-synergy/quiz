@@ -103,10 +103,18 @@
   border-bottom: 2px solid var(--color-border);
   background: transparent;
   text-align: center;
-  width: 200px;
+  width: 260px;
+  min-width: 0;
   outline: none;
   padding: 8px 0;
   transition: border-color 0.15s ease;
+}
+
+.numberInput::placeholder {
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
 }
 
 .numberInput:focus {
@@ -425,7 +433,11 @@
 
   .numberInput {
     font-size: 48px;
-    width: 170px;
+    width: 220px;
+  }
+
+  .numberInput::placeholder {
+    font-size: 30px;
   }
 
   .textInput {
