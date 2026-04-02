@@ -54,7 +54,6 @@ type Copy = {
   socialSub: string
   socialCta: string
   storiesHeading: string
-  stories: { name: string; text: string }[]
   personalHeading: (name: string) => string
   guaranteeTitle: string
   guaranteeBody: string
@@ -108,11 +107,6 @@ const EN: Copy = {
   socialSub: 'And many have seen real progress over time.',
   socialCta: 'Get started now',
   storiesHeading: 'Real stories from people using TAICHI COACH',
-  stories: [
-    { name: 'Anna K., 47', text: 'I was not sure this would work for me. I thought I would try it for a short time, but I kept going. After a few weeks, I felt lighter and more active. In 2 months, I lost 6 kg and feel much better in my body.' },
-    { name: 'Sophie R., 42', text: 'I needed something simple I could do at home. The plan was easy, and I did not feel overwhelmed. After some time, my back pain improved, and daily tasks became easier. I feel stronger and more in control now.' },
-    { name: 'Carla M., 48', text: 'I always struggled with my stomach area. The routine was simple, so I stayed consistent. After a few weeks, I started to see changes and feel more comfortable in my body. Now I feel much more confident.' },
-  ],
   personalHeading: (name) => `${name ? `${name}, build` : 'Build'} real results at your own pace`,
   guaranteeTitle: '28-Day Money-Back Guarantee',
   guaranteeBody: 'Try TAICHI COACH with no risk. If it is not the right fit for you, you can request a refund within 28 days. Please check our Refund Policy for full details.',
@@ -143,7 +137,6 @@ function localize(base: Copy, overrides: Partial<Copy>): Copy {
     ...overrides,
     plans: overrides.plans ?? base.plans,
     features: overrides.features ?? base.features,
-    stories: overrides.stories ?? base.stories,
     goalLabels: overrides.goalLabels ?? base.goalLabels,
     sleepLabels: overrides.sleepLabels ?? base.sleepLabels,
     fitnessLabels: overrides.fitnessLabels ?? base.fitnessLabels,
@@ -186,6 +179,12 @@ const COPY: Record<LangCode, Copy> = {
     bulletTitle: 'Su TAICHI COACH galite:',
     bullets: ['Sustiprinti pasitikėjimą', 'Turėti daugiau energijos', 'Atsipalaiduoti ir mažinti stresą', 'Palaikyti kūną ilgainiui'],
     whatYouGet: 'Ką gaunate su TAICHI COACH',
+    features: [
+      { title: 'Asmeninis judėjimo sistema', desc: 'Jūsų planas sukurtas atsižvelgiant į jūsų kūną, energiją ir kasdienį gyvenimą — o ne pagal bendrą rutiną.' },
+      { title: 'Aiški kasdienė kryptis', desc: 'Visada žinote, ką šiandien daryti, nereikia galvoti ar planuoti.' },
+      { title: 'Prisitaikanti pagalba, kuri seka paskui jus', desc: 'Planas keičiasi kartu su jumis — atsižvelgiant į jūsų pažangą, energiją ir nuoseklumą.' },
+      { title: 'Parama tada, kai labiausiai reikia', desc: 'Jei jaučiatės įstrigę, pavargę ar praleidote dieną — planas padeda sugrįžti į vėžes.' },
+    ],
     socialText: 'Milijonai žmonių jau išbandė paprastas kasdienio judėjimo rutinas',
     socialSub: 'Ir daugelis jų laikui bėgant pamatė tikrą pažangą.',
     socialCta: 'Pradėti dabar',
@@ -368,11 +367,6 @@ const COPY: Record<LangCode, Copy> = {
     goalLabels: { 'lose-weight': 'Zhubnout', 'heart-health': 'Zlepšit zdraví srdce', 'firm-toned': 'Více zpevnit postavu', 'lower-bio-age': 'Cítit se mladší a plný energie' },
     sleepLabels: { 'less-than-5': 'Špatná', '<5': 'Špatná', '5-6': 'Je potřeba zlepšit', '7-8': 'Dobrá', '8-9': 'Dobrá', '9+': 'Mohla by být lepší' },
     fitnessLabels: { sedentary: 'Nízká', 'lightly-active': 'Nízká', light: 'Nízká', moderate: 'Střední', intermediate: 'Střední', active: 'Vysoká', 'very-active': 'Vysoká', advanced: 'Vysoká' },
-    stories: [
-      { name: 'Anna K., 47', text: 'Nejdřív jsem si nebyla jistá, jestli to bude pro mě. Chtěla jsem to zkusit jen na chvíli, ale vydržela jsem. Po pár týdnech jsem se cítila lehčí a aktivnější. Za 2 měsíce jsem zhubla 6 kg a cítím se ve svém těle mnohem lépe.' },
-      { name: 'Sophie R., 42', text: 'Potřebovala jsem něco jednoduchého, co zvládnu doma. Plán byl snadný a necítila jsem se zahlceně. Po nějaké době se zlepšila bolest zad a běžné činnosti byly snazší. Teď se cítím silnější a jistější.' },
-      { name: 'Carla M., 48', text: 'Vždycky jsem bojovala s oblastí břicha. Rutina byla jednoduchá, takže jsem vydržela pravidelně pokračovat. Po pár týdnech jsem začala vidět změny a cítila se ve svém těle pohodlněji. Dnes mám mnohem větší sebejistotu.' },
-    ],
   }),
   dk: localize(EN, {
     plans: [
