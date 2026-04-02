@@ -264,7 +264,7 @@ function HistoryPanel({
   history: HistoryEntry[]
   lang: string
   onClose: () => void
-  onRestore: (overrides: Record<string, string>) => void
+  onRestore: (snapshot: HistorySnapshot) => void | Promise<void>
 }) {
   const [selected, setSelected] = useState<HistorySnapshot | null>(null)
   const [loadingEntry, setLoadingEntry] = useState<string | null>(null)
@@ -413,7 +413,7 @@ function HistoryPanel({
                     <div style={{ fontSize: 12, color: '#64748b' }}>by {selected.author}</div>
                   </div>
                   <button
-                    onClick={() => onRestore(selected.overrides)}
+                    onClick={() => onRestore(selected)}
                     style={{
                       background: '#6366f1',
                       color: '#fff',
@@ -509,6 +509,8 @@ export default function TranslationEditorPage() {
   const [selectedStep, setSelectedStep] = useState<number | null>(null)
   const [showPreview, setShowPreview] = useState(false)
   const [previewRefresh, setPreviewRefresh] = useState(0)
+  const previewFrameRef = useRef<HTMLIFrameElement>(null)
+  const previewScrollRef = useRef<{ x: number; y: number } | null>(null)
 
   const LANGUAGES_META: Record<string, { label: string; flag: string }> = {
     en: { label: 'English', flag: '🇬🇧' },
@@ -559,6 +561,20 @@ export default function TranslationEditorPage() {
   useEffect(() => {
     loadData()
   }, [loadData])
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault()
+        if (!saving && !isSource) {
+          void handleSave()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [saving, isSource, author, data, edits])
 
   // Count unsaved changes
   const unsavedCount = data
@@ -612,15 +628,45 @@ export default function TranslationEditorPage() {
     }
   }
 
-  async function doSave(authorName?: string) {
+  function capturePreviewScroll() {
+    try {
+      const win = previewFrameRef.current?.contentWindow
+      if (!win) return
+      previewScrollRef.current = {
+        x: win.scrollX,
+        y: win.scrollY,
+      }
+    } catch {
+      previewScrollRef.current = null
+    }
+  }
+
+  function refreshPreviewPreservingScroll() {
+    capturePreviewScroll()
+    setPreviewRefresh((v) => v + 1)
+  }
+
+  function handlePreviewLoad() {
+    const pos = previewScrollRef.current
+    if (!pos) return
+
+    try {
+      previewFrameRef.current?.contentWindow?.scrollTo(pos.x, pos.y)
+    } catch {
+      // ignore scroll restore issues for preview
+    }
+  }
+
+  async function doSave(authorName?: string, payload?: Record<string, string>) {
     if (!data) return
     const name = authorName ?? author
+    const nextEdits = payload ?? edits
     setSaving(true)
 
     const base = data.overrides ?? data.current
     const changes: ChangeEntry[] = []
 
-    for (const [key, newValue] of Object.entries(edits)) {
+    for (const [key, newValue] of Object.entries(nextEdits)) {
       const oldValue = base[key] ?? data.current[key] ?? ''
       if (newValue !== oldValue) {
         changes.push({ key, oldValue, newValue })
@@ -631,27 +677,41 @@ export default function TranslationEditorPage() {
       const res = await fetch(`/api/admin/translations/${lang}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ overrides: edits, author: name, changes }),
+        body: JSON.stringify({ overrides: nextEdits, author: name, changes }),
       })
       if (res.ok) {
+        const saved = (await res.json()) as { timestamp?: string }
+        const savedTimestamp = saved.timestamp ?? new Date().toISOString()
+        const savedFilename = savedTimestamp.replace(/[:.]/g, '-')
         setSaveSuccess(true)
         setTimeout(() => setSaveSuccess(false), 3000)
         setShowPreview(true)
+        refreshPreviewPreservingScroll()
         void waitForPreviewReady(
           getPreviewUrl(section, lang, selectedStep),
           changes.map((change) => change.newValue)
         ).then(() => {
-          setPreviewRefresh((v) => v + 1)
+          refreshPreviewPreservingScroll()
         })
         setData((prev) =>
           prev
             ? {
                 ...prev,
-                current: { ...edits },
+                current: { ...nextEdits },
                 overrides: null,
+                history: [
+                  {
+                    filename: savedFilename,
+                    timestamp: savedTimestamp,
+                    author: name || 'Unknown',
+                    changeCount: changes.length,
+                  },
+                  ...prev.history,
+                ],
               }
             : prev
         )
+        setEdits({ ...nextEdits })
       } else {
         const d = await res.json()
         alert(d.error ?? 'Save failed')
@@ -661,9 +721,10 @@ export default function TranslationEditorPage() {
     }
   }
 
-  function handleRestore(overrides: Record<string, string>) {
-    setEdits({ ...overrides })
+  async function handleRestore(snapshot: HistorySnapshot) {
+    setEdits({ ...snapshot.overrides })
     setShowHistory(false)
+    await doSave(author || `Restore: ${snapshot.author || 'history'}`, snapshot.overrides)
   }
 
   // Get keys for current section
@@ -828,29 +889,34 @@ export default function TranslationEditorPage() {
                 }}
               />
               {!isSource && (
-                <button
-                  onClick={handleSave}
-                  disabled={saving || unsavedCount === 0}
-                  style={{
-                    background:
-                      saveSuccess
-                        ? '#22c55e'
-                        : saving || unsavedCount === 0
-                        ? 'rgba(255,255,255,0.15)'
-                        : '#6366f1',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 8,
-                    padding: '8px 16px',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: saving || unsavedCount === 0 ? 'not-allowed' : 'pointer',
-                    transition: 'background 0.2s',
-                    minWidth: 80,
-                  }}
-                >
-                  {saveSuccess ? 'Saved!' : saving ? 'Saving...' : 'Save'}
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+                  <button
+                    onClick={handleSave}
+                    disabled={saving || unsavedCount === 0}
+                    style={{
+                      background:
+                        saveSuccess
+                          ? '#22c55e'
+                          : saving || unsavedCount === 0
+                          ? 'rgba(255,255,255,0.15)'
+                          : '#6366f1',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 8,
+                      padding: '8px 16px',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: saving || unsavedCount === 0 ? 'not-allowed' : 'pointer',
+                      transition: 'background 0.2s',
+                      minWidth: 80,
+                    }}
+                  >
+                    {saveSuccess ? 'Saved!' : saving ? 'Saving...' : 'Save'}
+                  </button>
+                  <div style={{ fontSize: 11, color: '#cbd5e1', lineHeight: 1 }}>
+                    Save shortcut: {typeof navigator !== 'undefined' && navigator.platform.toUpperCase().includes('MAC') ? 'Cmd+S' : 'Ctrl+S'}
+                  </div>
+                </div>
               )}
             </div>
             <button
@@ -1299,7 +1365,7 @@ export default function TranslationEditorPage() {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
-                  onClick={() => setPreviewRefresh((v) => v + 1)}
+                  onClick={refreshPreviewPreservingScroll}
                   style={{
                     background: '#fff',
                     color: '#334155',
@@ -1347,9 +1413,11 @@ export default function TranslationEditorPage() {
             </div>
 
             <iframe
+              ref={previewFrameRef}
               key={previewUrlWithRefresh}
               title="Quiz preview"
               src={previewUrlWithRefresh}
+              onLoad={handlePreviewLoad}
               style={{
                 width: '100%',
                 height: 'calc(100vh - 210px)',
