@@ -3,10 +3,13 @@
  * i18n completeness validator — pre-commit hook
  *
  * Checks:
- *   1. PaywallContent.tsx  — every language has every top-level field that EN has
- *   2. ReviewCarousel.tsx  — every language has a REVIEWS entry
- *   3. lib/i18n.ts         — every language appears in every translation const block
- *   4. TypeScript compile  — catches any type-level gaps
+ *   1. lib/paywall-copy.ts   — every language has every top-level field that EN has
+ *   2. lib/reviews-data.ts   — every language has a REVIEWS entry with required fields
+ *   3. lib/i18n.ts           — every language appears in every translation const block
+ *   4. Admin serializer      — serializePaywall covers ALL Copy keys & is called with lang
+ *   5. applyPaywallOverrides — handles ALL Copy fields (functions, arrays, nested objects)
+ *   6. TypeScript compile    — catches any type-level gaps
+ *   7. Hardcoded English     — warns about obvious unhardcoded strings in JSX
  */
 
 const fs   = require('fs')
@@ -22,45 +25,36 @@ function err(msg) { console.error(`  ❌  ${msg}`); hasErrors = true }
 function warn(msg) { console.warn (`  ⚠️   ${msg}`) }
 
 // ─── Extract top-level keys only (depth 1) from a JS/TS object literal ───────
-// e.g. "{ a: 1, b: { c: 2 } }" → ['a', 'b']  (NOT 'c')
 function topLevelKeys(src) {
   const keys = []
   let depth = 0
   let i = 0
-  // skip opening brace
   while (i < src.length && src[i] !== '{') i++
-  i++ // consume '{'
+  i++
   depth = 1
 
   while (i < src.length && depth > 0) {
     const ch = src[i]
     if (ch === '{' || ch === '[') { depth++; i++; continue }
     if (ch === '}' || ch === ']') { depth--; i++; continue }
-    // at depth 1, look for a key
     if (depth === 1) {
-      // skip whitespace / commas
       if (/[\s,]/.test(ch)) { i++; continue }
-      // skip comments
       if (ch === '/' && src[i+1] === '/') { while (i < src.length && src[i] !== '\n') i++; continue }
-      // match key: identifier or quoted string, followed by ':'
       const rest = src.slice(i)
       const m = rest.match(/^(?:'([^']*)'|"([^"]*)"|(`[^`]*`)|([a-zA-Z_$][a-zA-Z0-9_$]*))\s*:/)
       if (m) {
         const key = m[1] ?? m[2] ?? m[3] ?? m[4]
         if (key && !keys.includes(key)) keys.push(key)
-        // advance past key + colon
         i += m[0].length
-        // skip value at depth 1 (fast-forward to next comma at same depth)
         let vDepth = 0
         while (i < src.length) {
           const vc = src[i]
           if (vc === '{' || vc === '[' || vc === '(') { vDepth++; i++; continue }
           if (vc === '}' || vc === ']' || vc === ')') {
-            if (vDepth === 0) break // end of parent object
+            if (vDepth === 0) break
             vDepth--; i++; continue
           }
           if (vc === ',' && vDepth === 0) { i++; break }
-          // skip strings to avoid false brace counting
           if (vc === '"' || vc === "'" || vc === '`') {
             const q = vc; i++
             while (i < src.length && src[i] !== q) {
@@ -79,7 +73,7 @@ function topLevelKeys(src) {
   return keys
 }
 
-// ─── Extract the brace-balanced substring starting at the first '{' after idx ─
+// ─── Extract brace-balanced block starting at first '{' after startIdx ────────
 function extractBraceBlock(src, startIdx) {
   let i = startIdx
   while (i < src.length && src[i] !== '{') i++
@@ -92,35 +86,40 @@ function extractBraceBlock(src, startIdx) {
   return ''
 }
 
-// ─── 1. lib/paywall-copy.ts (previously PaywallContent.tsx) ──────────────────
+// ─── Extract function body (brace-balanced) for a named function ──────────────
+function extractFunctionBody(src, fnSignature) {
+  const idx = src.indexOf(fnSignature)
+  if (idx === -1) return null
+  return extractBraceBlock(src, idx)
+}
+
+// ─── 1. lib/paywall-copy.ts ───────────────────────────────────────────────────
 function checkPaywall() {
   console.log('  📋  lib/paywall-copy.ts')
   const file = path.join(ROOT, 'lib/paywall-copy.ts')
   if (!fs.existsSync(file)) { err('lib/paywall-copy.ts not found'); return }
   const src = fs.readFileSync(file, 'utf8')
 
-  // Extract EN's top-level keys
   const enIdx = src.indexOf('export const EN: Copy = {')
   if (enIdx === -1) { err('Cannot find EN object in lib/paywall-copy.ts'); return }
   const enBlock = extractBraceBlock(src, enIdx)
   const enKeys  = topLevelKeys(enBlock)
+
+  if (enKeys.length === 0) { err('Could not extract any keys from EN object'); return }
 
   for (const lang of LANG_CODES) {
     if (lang === 'en') continue
     const marker   = `  ${lang}: localize(EN,`
     const startIdx = src.indexOf(marker)
     if (startIdx === -1) { err(`paywall-copy: "${lang}" missing from COPY`); continue }
-
-    // marker ends right before the overrides object: `  lt: localize(EN, {`
-    // so the first `{` after startIdx+marker.length is the overrides block
     const block = extractBraceBlock(src, startIdx + marker.length)
     const langKeys = topLevelKeys(block)
     const missing  = enKeys.filter(k => !langKeys.includes(k))
-    if (missing.length > 0) err(`paywall-copy [${lang}] missing: ${missing.join(', ')}`)
+    if (missing.length > 0) err(`paywall-copy [${lang}] missing keys: ${missing.join(', ')}`)
   }
 }
 
-// ─── 2. lib/reviews-data.ts (previously ReviewCarousel.tsx) ──────────────────
+// ─── 2. lib/reviews-data.ts ───────────────────────────────────────────────────
 function checkReviews() {
   console.log('  🎠  lib/reviews-data.ts')
   const file = path.join(ROOT, 'lib/reviews-data.ts')
@@ -135,18 +134,37 @@ function checkReviews() {
     if (!new RegExp(`^\\s+${lang}\\s*:`,'m').test(block))
       err(`reviews-data REVIEWS: language "${lang}" missing`)
   }
+
+  // Verify each review entry has required fields
+  const requiredReviewFields = ['photo', 'name', 'text', 'stars']
+  for (const lang of LANG_CODES) {
+    const langMarker = `  ${lang}: [`
+    const langIdx = src.indexOf(langMarker)
+    if (langIdx === -1) continue
+    // Find the array block for this lang
+    let arrStart = langIdx + langMarker.length - 1
+    while (arrStart < src.length && src[arrStart] !== '[') arrStart++
+    let depth = 0, arrEnd = arrStart
+    for (let i = arrStart; i < src.length; i++) {
+      if (src[i] === '[') depth++
+      else if (src[i] === ']') { depth--; if (depth === 0) { arrEnd = i; break } }
+    }
+    const arrBlock = src.substring(arrStart, arrEnd + 1)
+    for (const field of requiredReviewFields) {
+      if (!arrBlock.includes(`${field}:`)) {
+        err(`reviews-data [${lang}]: review missing field "${field}"`)
+      }
+    }
+  }
 }
 
 // ─── 3. lib/i18n.ts ───────────────────────────────────────────────────────────
-// i18n.ts stores data in `const XXXXX: Record<LangCode,...> = { en:{...}, lt:{...}, ... }`
-// TypeScript types enforce key completeness — here we just verify every language is present.
 function checkI18n() {
   console.log('  📚  lib/i18n.ts')
   const file = path.join(ROOT, 'lib/i18n.ts')
   if (!fs.existsSync(file)) { err('lib/i18n.ts not found'); return }
   const src = fs.readFileSync(file, 'utf8')
 
-  // Find every `const XYZ: Record<LangCode` block and verify all langs present
   const constRe = /^const (\w+)\s*:\s*Record<LangCode[^=]*=\s*\{/gm
   let m
   while ((m = constRe.exec(src)) !== null) {
@@ -159,18 +177,127 @@ function checkI18n() {
   }
 }
 
-// ─── 4. TypeScript type-check ─────────────────────────────────────────────────
+// ─── 4. Admin serializer coverage ────────────────────────────────────────────
+// Verifies that serializePaywall() in the admin route:
+//   a) References every top-level key from the EN Copy object
+//   b) Is called with the lang parameter (not zero-arg)
+//   c) serializeAll() calls serializePaywall(lang)
+function checkAdminSerializer() {
+  console.log('  🔧  Admin serializer (route.ts covers all Copy keys)')
+
+  const routeFile = path.join(ROOT, 'app/api/admin/translations/[lang]/route.ts')
+  if (!fs.existsSync(routeFile)) { err('Admin route file not found'); return }
+  const routeSrc = fs.readFileSync(routeFile, 'utf8')
+
+  // Verify serializePaywall accepts lang param
+  if (!/function serializePaywall\s*\(\s*lang\s*[,:)]/m.test(routeSrc)) {
+    err('serializePaywall must accept a "lang" parameter — found zero-arg or differently-named version')
+  }
+
+  // Verify serializeAll calls serializePaywall(lang)
+  const serializeAllBody = extractFunctionBody(routeSrc, 'function serializeAll(')
+  if (!serializeAllBody) {
+    err('serializeAll function not found in route.ts')
+  } else if (!/serializePaywall\s*\(\s*lang\s*\)/.test(serializeAllBody)) {
+    err('serializeAll does not call serializePaywall(lang) — paywall translations ignore current language')
+  }
+
+  // Get EN keys from paywall-copy.ts
+  const copyFile = path.join(ROOT, 'lib/paywall-copy.ts')
+  if (!fs.existsSync(copyFile)) { err('lib/paywall-copy.ts not found for admin check'); return }
+  const copySrc = fs.readFileSync(copyFile, 'utf8')
+  const enIdx = copySrc.indexOf('export const EN: Copy = {')
+  if (enIdx === -1) { err('Cannot find EN in paywall-copy.ts'); return }
+  const enBlock = extractBraceBlock(copySrc, enIdx)
+  const enKeys = topLevelKeys(enBlock)
+
+  // Extract serializePaywall function body
+  const fnBody = extractFunctionBody(routeSrc, 'function serializePaywall(')
+  if (!fnBody) { err('serializePaywall function body not found'); return }
+
+  // Each EN key must appear somewhere in the function body
+  // (either as copy.key or as the string key in a 'paywall.key' pattern)
+  const missingKeys = enKeys.filter(k => {
+    const appearsAsProperty  = fnBody.includes(`copy.${k}`)
+    const appearsAsString    = fnBody.includes(`'${k}'`) || fnBody.includes(`"${k}"`)
+    const appearsAsVar       = fnBody.includes(`.${k}`)
+    return !appearsAsProperty && !appearsAsString && !appearsAsVar
+  })
+  if (missingKeys.length > 0) {
+    err(`serializePaywall does not serialize these Copy keys: ${missingKeys.join(', ')}`)
+  }
+
+  // Also verify REVIEWS are serialized for each language
+  if (!fnBody.includes('REVIEWS') && !fnBody.includes('reviews')) {
+    err('serializePaywall does not include REVIEWS — admin cannot edit review text')
+  }
+}
+
+// ─── 5. applyPaywallOverrides coverage ───────────────────────────────────────
+// Verifies the override applicator handles every Copy key
+function checkApplyOverrides() {
+  console.log('  🔄  applyPaywallOverrides handles all Copy keys')
+
+  const overridesFile = path.join(ROOT, 'lib/use-translation-overrides.ts')
+  if (!fs.existsSync(overridesFile)) { err('use-translation-overrides.ts not found'); return }
+  const src = fs.readFileSync(overridesFile, 'utf8')
+
+  // Function may have generics: applyPaywallOverrides<T extends ...>(
+  const fnBody = extractFunctionBody(src, 'export function applyPaywallOverrides')
+  if (!fnBody) { err('applyPaywallOverrides function not found'); return }
+
+  // Get EN keys
+  const copyFile = path.join(ROOT, 'lib/paywall-copy.ts')
+  if (!fs.existsSync(copyFile)) return
+  const copySrc = fs.readFileSync(copyFile, 'utf8')
+  const enIdx = copySrc.indexOf('export const EN: Copy = {')
+  if (enIdx === -1) return
+  const enBlock = extractBraceBlock(copySrc, enIdx)
+  const enKeys = topLevelKeys(enBlock)
+
+  // Complex-typed keys (functions, arrays, nested objects) MUST be explicitly handled.
+  // Simple string keys can be handled by a catch-all `patch[key] = v` clause.
+  const complexKeys = ['discount', 'perDay', 'consentBody', 'fitnessAgeValue', 'personalHeading',
+                       'bullets', 'plans', 'features', 'goalLabels', 'sleepLabels', 'fitnessLabels', 'bmi']
+
+  // Complex keys may appear as exact ('bullets') or as prefix ('bullets.')
+  const missingComplex = complexKeys.filter(k =>
+    !fnBody.includes(`'${k}'`) && !fnBody.includes(`"${k}"`) &&
+    !fnBody.includes(`'${k}.'`) && !fnBody.includes(`"${k}."`) &&
+    !fnBody.includes(`key.startsWith('${k}`) && !fnBody.includes(`key.startsWith("${k}`)
+  )
+  if (missingComplex.length > 0) {
+    err(`applyPaywallOverrides missing explicit handling for complex keys: ${missingComplex.join(', ')}`)
+  }
+
+  // Simple string keys only need explicit handling if there's no catch-all
+  const hasCatchAll = /patch\[key\]\s*=\s*v/.test(fnBody)
+  if (!hasCatchAll) {
+    const simpleKeys = enKeys.filter(k => !complexKeys.includes(k))
+    const missingSimpKeys = simpleKeys.filter(k =>
+      !fnBody.includes(`'${k}'`) && !fnBody.includes(`"${k}"`)
+    )
+    if (missingSimpKeys.length > 0) {
+      err(`applyPaywallOverrides missing handling for simple keys (and no catch-all found): ${missingSimpKeys.join(', ')}`)
+    }
+  }
+}
+
+// ─── 6. TypeScript type-check ─────────────────────────────────────────────────
 function checkTypes() {
   console.log('  🔷  TypeScript type check (tsc --noEmit)')
   try {
-    execSync('npx tsc --noEmit', { cwd: ROOT, stdio: 'pipe' })
+    // Run tsc via node directly to avoid PATH/shebang issues
+    const nodeExe = process.execPath
+    const tscJs = path.join(ROOT, 'node_modules', 'typescript', 'bin', 'tsc')
+    execSync(`"${nodeExe}" "${tscJs}" --noEmit`, { cwd: ROOT, stdio: 'pipe' })
   } catch (e) {
     const output = (e.stdout?.toString() || '') + (e.stderr?.toString() || '')
     err(`TypeScript errors found:\n${output.split('\n').slice(0,10).map(l=>'      '+l).join('\n')}`)
   }
 }
 
-// ─── 5. Warn about obvious hardcoded English in JSX ──────────────────────────
+// ─── 7. Warn about obvious hardcoded English in JSX ──────────────────────────
 function checkHardcoded() {
   console.log('  🔤  Hardcoded English strings (warnings only)')
   const IGNORE = [
@@ -216,6 +343,8 @@ console.log('\n🌐  Validating i18n completeness...\n')
 checkPaywall()
 checkReviews()
 checkI18n()
+checkAdminSerializer()
+checkApplyOverrides()
 checkTypes()
 checkHardcoded()
 
