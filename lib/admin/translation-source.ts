@@ -23,6 +23,10 @@ import type { QuizStep } from '@/lib/quiz-data'
 
 export const VALID_LANGS: LangCode[] = ['en', 'lt', 'lv', 'ro', 'cz', 'dk', 'gr', 'hu', 'hr', 'il', 'jp', 'ru', 'sk', 'tw']
 
+function getCurrentTranslationsDir() {
+  return path.join(process.cwd(), 'translations-data', 'current')
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function callFn(fn: (...args: any[]) => string, ...args: unknown[]): string {
   return fn(...args)
@@ -254,6 +258,24 @@ export function serializeAll(lang: LangCode): Record<string, string> {
 
 export function getAllSerializedTranslations(): Record<LangCode, Record<string, string>> {
   return Object.fromEntries(VALID_LANGS.map((lang) => [lang, serializeAll(lang)])) as Record<LangCode, Record<string, string>>
+}
+
+export function getRuntimeTranslations(lang: LangCode): Record<string, string> {
+  const runtimePath = path.join(getCurrentTranslationsDir(), `${lang}.json`)
+  if (fs.existsSync(runtimePath)) {
+    try {
+      return JSON.parse(fs.readFileSync(runtimePath, 'utf-8')) as Record<string, string>
+    } catch {
+      // fall through to source snapshot
+    }
+  }
+  return serializeAll(lang)
+}
+
+export function writeRuntimeTranslations(lang: LangCode, flat: Record<string, string>) {
+  const dir = getCurrentTranslationsDir()
+  fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(path.join(dir, `${lang}.json`), JSON.stringify(flat, null, 2), 'utf-8')
 }
 
 function quote(v: string): string {

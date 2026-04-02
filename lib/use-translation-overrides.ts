@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useState } from 'react'
 import type { LangCode } from './lang-store'
 import type { QuizStep } from './quiz-data'
 import type {
@@ -10,11 +11,46 @@ import type {
 } from './i18n'
 import type { Review } from './reviews-data'
 
-// Admin now writes directly to the source TypeScript files. The quiz reads those
-// source modules directly, so runtime JSON overrides are intentionally disabled.
+const runtimeCache: Partial<Record<LangCode, Record<string, string>>> = {}
+const inFlight: Partial<Record<LangCode, Promise<Record<string, string>>>> = {}
+
+async function loadRuntimeTranslations(lang: LangCode): Promise<Record<string, string>> {
+  if (!inFlight[lang]) {
+    inFlight[lang] = fetch(`/api/translations/${lang}`, {
+      cache: 'no-store',
+      credentials: 'same-origin',
+    })
+      .then(async (res) => {
+        if (!res.ok) return {}
+        return (await res.json()) as Record<string, string>
+      })
+      .catch(() => ({}))
+      .finally(() => {
+        delete inFlight[lang]
+      })
+  }
+
+  const data = await inFlight[lang]!
+  runtimeCache[lang] = data
+  return data
+}
+
 export function useTranslationOverrides(lang: LangCode): Record<string, string> {
-  void lang
-  return {}
+  const [overrides, setOverrides] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    let cancelled = false
+
+    void loadRuntimeTranslations(lang).then((data) => {
+      if (!cancelled) setOverrides(data)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [lang])
+
+  return overrides
 }
 
 // ─── Section helpers ───────────────────────────────────────────────────────

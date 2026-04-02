@@ -6,6 +6,8 @@ import {
   VALID_LANGS,
   serializeAll,
   getAllSerializedTranslations,
+  getRuntimeTranslations,
+  writeRuntimeTranslations,
   writeTranslationSources,
 } from '@/lib/admin/translation-source'
 
@@ -38,7 +40,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ lang
 
   const langCode = lang as LangCode
   const enTranslations = serializeAll('en')
-  const currentTranslations = langCode === 'en' ? enTranslations : serializeAll(langCode)
+  const currentTranslations = langCode === 'en' ? enTranslations : getRuntimeTranslations(langCode)
 
   const historyDir = path.join(DATA_DIR, 'history', langCode)
   const history: HistoryEntry[] = []
@@ -106,6 +108,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ lan
     const flatByLang = getAllSerializedTranslations()
     flatByLang[langCode] = overrides
     writeTranslationSources(flatByLang)
+    writeRuntimeTranslations(langCode, overrides)
 
     const historyDir = path.join(DATA_DIR, 'history', langCode)
     fs.mkdirSync(historyDir, { recursive: true })
