@@ -102,18 +102,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ lan
     )
   }
 
-  const flatByLang = getAllSerializedTranslations()
-  flatByLang[langCode] = overrides
-  writeTranslationSources(flatByLang)
+  try {
+    const flatByLang = getAllSerializedTranslations()
+    flatByLang[langCode] = overrides
+    writeTranslationSources(flatByLang)
 
-  const historyDir = path.join(DATA_DIR, 'history', langCode)
-  fs.mkdirSync(historyDir, { recursive: true })
-  const safeTimestamp = timestamp.replace(/[:.]/g, '-')
-  fs.writeFileSync(
-    path.join(historyDir, `${safeTimestamp}.json`),
-    JSON.stringify({ timestamp, author, changes, overrides }, null, 2),
-    'utf-8'
-  )
+    const historyDir = path.join(DATA_DIR, 'history', langCode)
+    fs.mkdirSync(historyDir, { recursive: true })
+    const safeTimestamp = timestamp.replace(/[:.]/g, '-')
+    fs.writeFileSync(
+      path.join(historyDir, `${safeTimestamp}.json`),
+      JSON.stringify({ timestamp, author, changes, overrides }, null, 2),
+      'utf-8'
+    )
 
-  return NextResponse.json({ success: true, timestamp })
+    return NextResponse.json({ success: true, timestamp })
+  } catch (error) {
+    console.error('Failed to save admin translations', error)
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'Failed to save translations',
+        cwd: process.cwd(),
+      },
+      { status: 500 }
+    )
+  }
 }

@@ -581,6 +581,37 @@ export default function TranslationEditorPage() {
     await doSave()
   }
 
+  async function waitForPreviewReady(url: string, expectedValues: string[]) {
+    const snippets = expectedValues
+      .map((value) => value.trim())
+      .filter((value) => value.length >= 2)
+      .slice(0, 3)
+
+    if (snippets.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      return
+    }
+
+    for (let attempt = 0; attempt < 12; attempt++) {
+      try {
+        const res = await fetch(`${url}${url.includes('?') ? '&' : '?'}adminPreviewProbe=${Date.now()}`, {
+          cache: 'no-store',
+          credentials: 'same-origin',
+        })
+        if (res.ok) {
+          const html = await res.text()
+          if (snippets.every((snippet) => html.includes(snippet))) {
+            return
+          }
+        }
+      } catch {
+        // ignore transient rebuild/hydration timing issues and retry
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+  }
+
   async function doSave(authorName?: string) {
     if (!data) return
     const name = authorName ?? author
@@ -605,7 +636,13 @@ export default function TranslationEditorPage() {
       if (res.ok) {
         setSaveSuccess(true)
         setTimeout(() => setSaveSuccess(false), 3000)
-        setPreviewRefresh((v) => v + 1)
+        setShowPreview(true)
+        void waitForPreviewReady(
+          getPreviewUrl(section, lang, selectedStep),
+          changes.map((change) => change.newValue)
+        ).then(() => {
+          setPreviewRefresh((v) => v + 1)
+        })
         setData((prev) =>
           prev
             ? {
@@ -615,9 +652,6 @@ export default function TranslationEditorPage() {
               }
             : prev
         )
-        setTimeout(() => {
-          loadData()
-        }, 300)
       } else {
         const d = await res.json()
         alert(d.error ?? 'Save failed')
