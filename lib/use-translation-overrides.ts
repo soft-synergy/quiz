@@ -10,6 +10,7 @@ import type {
   LoadingTranslations,
 } from './i18n'
 import type { Review } from './reviews-data'
+import type { PaywallStory } from './paywall-stories-data'
 
 const runtimeCache: Partial<Record<LangCode, Record<string, string>>> = {}
 const inFlight: Partial<Record<LangCode, Promise<Record<string, string>>>> = {}
@@ -283,6 +284,10 @@ export function applyPaywallOverrides<T extends Record<string, unknown>>(
       bmi[cat] = catObj
       patch.bmi = bmi
     }
+    // stories.0.name, etc. — handled separately via applyStoriesOverrides
+    else if (key.startsWith('stories.')) {
+      // skip — stories are patched separately
+    }
     // reviews.0.name, etc. — skip, reviews are read-only in admin
     else if (!key.startsWith('reviews.')) {
       // Simple string fields
@@ -291,6 +296,21 @@ export function applyPaywallOverrides<T extends Record<string, unknown>>(
   }
 
   return { ...(copy as object), ...patch } as T
+}
+
+/** paywall stories — patches stories.N.name/text/photo/stars from overrides */
+export function applyStoriesOverrides(stories: PaywallStory[], ov: Record<string, string>): PaywallStory[] {
+  const result = [...stories]
+  for (const [k, v] of Object.entries(ov)) {
+    if (!k.startsWith('paywall.stories.')) continue
+    const parts = k.split('.')  // ['paywall', 'stories', N, field]
+    const idx = parseInt(parts[2])
+    const field = parts[3]
+    if (!isNaN(idx) && field && result[idx]) {
+      result[idx] = { ...result[idx], [field]: field === 'stars' ? Number(v) : v }
+    }
+  }
+  return result
 }
 
 /** quiz steps */

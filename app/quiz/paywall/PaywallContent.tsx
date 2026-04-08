@@ -11,7 +11,7 @@ import { localizeBrandValue } from '@/lib/brand'
 import { LANGUAGES } from '@/lib/i18n'
 import { COPY, EN, type Copy } from '@/lib/paywall-copy'
 import { PAYWALL_STORIES } from '@/lib/paywall-stories-data'
-import { useTranslationOverrides, applyPaywallOverrides } from '@/lib/use-translation-overrides'
+import { useTranslationOverrides, applyPaywallOverrides, applyStoriesOverrides } from '@/lib/use-translation-overrides'
 
 const VALID_LANGS = new Set<string>(LANGUAGES.map((l) => l.code))
 
@@ -134,7 +134,7 @@ export function PaywallContent({ checkoutSlug = 'checkout' }: { checkoutSlug?: s
   const overrides = useTranslationOverrides(lang)
   const copy = applyPaywallOverrides(localizeBrandValue(COPY[lang] ?? EN, lang), overrides)
 
-  const stories = PAYWALL_STORIES[lang] ?? PAYWALL_STORIES.en
+  const stories = applyStoriesOverrides(PAYWALL_STORIES[lang] ?? PAYWALL_STORIES.en, overrides)
   const [selected, setSelected] = useState<string>('12w')
   const [consent, setConsent] = useState(false)
 
