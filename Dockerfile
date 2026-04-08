@@ -19,6 +19,9 @@ COPY --from=builder /app/lib ./lib
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+# Create translations-data directory — mount a volume here on the host to persist admin edits across deploys
+RUN mkdir -p translations-data/current translations-data/history
+
 # Install sharp for Next.js image optimization (after standalone copy so it lands in the right node_modules)
 RUN npm install --no-save sharp
 
